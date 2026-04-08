@@ -90,8 +90,20 @@ export class Runner {
 
   private static buildToolSchemas(tools: Tool[]): ToolSchema[] {
     const registry = new DefaultToolRegistry();
-    // TODO: Build tool schemas from registered tools
-    return [];
+    const schemas: ToolSchema[] = [];
+    
+    for (const tool of tools) {
+      const toolDef = registry.getTools().get(tool);
+      if (toolDef) {
+        schemas.push({
+          name: toolDef.getName(),
+          description: toolDef.getDescription(),
+          parameters: toolDef.getParameters(),
+        });
+      }
+    }
+    
+    return schemas;
   }
 
   private static async executeTool(toolCall: ToolCall): Promise<ToolResult> {

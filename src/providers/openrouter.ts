@@ -2,7 +2,8 @@
  * OpenRouter provider using raw HTTP, no external SDK.
  */
 
-import { Provider, Message, ToolSchema, ChatResponse, ToolCall } from "../types";
+import { Provider } from "../types/provider";
+import { Message, ToolSchema, ChatResponse, ToolCall } from "../types";
 import { config as defaultConfig } from "../config";
 
 export class OpenRouterProvider implements Provider {

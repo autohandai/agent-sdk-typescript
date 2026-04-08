@@ -5,7 +5,7 @@
 import { ReadFileTool, WriteFileTool, EditFileTool } from "../../index";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { mkdtemp, rmdir } from "fs/promises";
+import { mkdtemp } from "fs/promises";
 import { tmpdir } from "os";
 
 describe("ReadFileTool", () => {
@@ -16,7 +16,7 @@ describe("ReadFileTool", () => {
   });
 
   afterEach(async () => {
-    await rmdir(tempDir);
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   test("has correct name", () => {
@@ -71,7 +71,7 @@ describe("WriteFileTool", () => {
   });
 
   afterEach(async () => {
-    await rmdir(tempDir, { recursive: true });
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   test("has correct name", () => {
@@ -124,7 +124,7 @@ describe("EditFileTool", () => {
   });
 
   afterEach(async () => {
-    await rmdir(tempDir, { recursive: true });
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   test("has correct name", () => {

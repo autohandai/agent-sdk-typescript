@@ -70,24 +70,38 @@ const config = loadConfig();
 - `GIT_LOG` - Show git log
 - `GIT_COMMIT` - Commit changes
 - `GIT_ADD` - Stage files
-- And more git operations...
+- `GIT_RESET` - Reset current HEAD
+- `GIT_PUSH` - Push to remote
+- `GIT_PULL` - Pull from remote
+- `GIT_FETCH` - Fetch from remote
+- `GIT_CHECKOUT` - Switch branches or restore files
+- `GIT_BRANCH` - List, create, or delete branches
+- `GIT_MERGE` - Join development histories
+- `GIT_REBASE` - Reapply commits on top of another base
+- `GIT_STASH` - Stash changes in working directory
 
 ### Web
-- `WEB_SEARCH` - Search the web
+- `WEB_SEARCH` - Search the web (requires API configuration)
 
 ### Notebook
 - `NOTEBOOK_READ` - Read Jupyter notebooks
-- `NOTEBOOK_EDIT` - Edit Jupyter notebooks
+- `NOTEBOOK_EDIT` - Edit Jupyter notebook cells
 
 ### Dependencies
-- `READ_PACKAGE_MANIFEST` - Read package manifests
-- `ADD_DEPENDENCY` - Add dependencies
-- `REMOVE_DEPENDENCY` - Remove dependencies
+- `READ_PACKAGE_MANIFEST` - Read package manifests (package.json, requirements.txt, etc.)
+- `ADD_DEPENDENCY` - Add dependencies (requires package manager CLI)
+- `REMOVE_DEPENDENCY` - Remove dependencies (requires package manager CLI)
 
-### Formatters & Linters
-- `FORMAT_FILE`, `FORMAT_DIRECTORY` - Format code
-- `LINT_FILE`, `LINT_DIRECTORY` - Lint code
-- `LIST_FORMATTERS`, `LIST_LINTERS` - List available tools
+### Formatters
+- `FORMAT_FILE` - Format a file using a code formatter (requires formatter CLI)
+- `FORMAT_DIRECTORY` - Format all files in a directory (requires formatter CLI)
+- `LIST_FORMATTERS` - List available code formatters
+- `CHECK_FORMATTING` - Check if a file is properly formatted (requires formatter CLI)
+
+### Linters
+- `LINT_FILE` - Lint a file using a code linter (requires linter CLI)
+- `LINT_DIRECTORY` - Lint all files in a directory (requires linter CLI)
+- `LIST_LINTERS` - List available code linters
 
 ## Custom Tools
 

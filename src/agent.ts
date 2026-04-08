@@ -2,7 +2,8 @@
  * An AI agent with instructions, tools, and a model configuration.
  */
 
-import { Tool, AgentOptions, Provider } from "./types";
+import { Tool, AgentOptions } from "./types/index";
+import { Provider } from "./types/provider";
 
 export class Agent {
   name: string;

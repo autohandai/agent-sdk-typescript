@@ -18,7 +18,63 @@ export { createProvider, createProviderByName } from "./providers/factory";
 // Tools
 export { ToolDefinition } from "./tools/base";
 export { ToolRegistry, DefaultToolRegistry } from "./tools/registry";
+
+// Filesystem tools
 export { ReadFileTool } from "./tools/filesystem/read";
 export { WriteFileTool } from "./tools/filesystem/write";
 export { EditFileTool } from "./tools/filesystem/edit";
+export {
+  ApplyPatchTool,
+  FindTool,
+  GlobTool,
+  SearchInFilesTool,
+} from "./tools/filesystem/extended";
+
+// Command tools
 export { BashTool } from "./tools/bash";
+
+// Git tools
+export {
+  GitStatusTool,
+  GitDiffTool,
+  GitLogTool,
+  GitCommitTool,
+  GitAddTool,
+  GitResetTool,
+  GitPushTool,
+  GitPullTool,
+  GitFetchTool,
+  GitCheckoutTool,
+  GitBranchTool,
+  GitMergeTool,
+  GitRebaseTool,
+  GitStashTool,
+} from "./tools/git";
+
+// Web tools
+export { WebSearchTool } from "./tools/web";
+
+// Notebook tools
+export { NotebookReadTool, NotebookEditTool } from "./tools/notebook";
+
+// Dependency tools
+export {
+  ReadPackageManifestTool,
+  AddDependencyTool,
+  RemoveDependencyTool,
+} from "./tools/dependencies";
+
+// Formatter tools
+export {
+  FormatFileTool,
+  FormatDirectoryTool,
+  ListFormattersTool,
+  CheckFormattingTool,
+} from "./tools/formatters";
+
+// Linter tools
+export {
+  LintFileTool,
+  LintDirectoryTool,
+  ListLintersTool,
+} from "./tools/linters";

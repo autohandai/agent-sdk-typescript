@@ -8,6 +8,46 @@ import { ReadFileTool } from "./filesystem/read";
 import { WriteFileTool } from "./filesystem/write";
 import { EditFileTool } from "./filesystem/edit";
 import { BashTool } from "./bash";
+import {
+  ApplyPatchTool,
+  FindTool,
+  GlobTool,
+  SearchInFilesTool,
+} from "./filesystem/extended";
+import {
+  GitStatusTool,
+  GitDiffTool,
+  GitLogTool,
+  GitCommitTool,
+  GitAddTool,
+  GitResetTool,
+  GitPushTool,
+  GitPullTool,
+  GitFetchTool,
+  GitCheckoutTool,
+  GitBranchTool,
+  GitMergeTool,
+  GitRebaseTool,
+  GitStashTool,
+} from "./git";
+import { WebSearchTool } from "./web";
+import { NotebookReadTool, NotebookEditTool } from "./notebook";
+import {
+  ReadPackageManifestTool,
+  AddDependencyTool,
+  RemoveDependencyTool,
+} from "./dependencies";
+import {
+  FormatFileTool,
+  FormatDirectoryTool,
+  ListFormattersTool,
+  CheckFormattingTool,
+} from "./formatters";
+import {
+  LintFileTool,
+  LintDirectoryTool,
+  ListLintersTool,
+} from "./linters";
 
 export class ToolRegistry {
   private tools: Map<Tool, ToolDefinition> = new Map();
@@ -57,10 +97,51 @@ export class DefaultToolRegistry extends ToolRegistry {
     this.register(new ReadFileTool());
     this.register(new WriteFileTool());
     this.register(new EditFileTool());
+    this.register(new ApplyPatchTool());
+    this.register(new FindTool());
+    this.register(new GlobTool());
+    this.register(new SearchInFilesTool());
     
     // Register bash tool
     this.register(new BashTool());
     
-    // TODO: Add more tools as needed (git, web search, etc.)
+    // Register git tools
+    this.register(new GitStatusTool());
+    this.register(new GitDiffTool());
+    this.register(new GitLogTool());
+    this.register(new GitCommitTool());
+    this.register(new GitAddTool());
+    this.register(new GitResetTool());
+    this.register(new GitPushTool());
+    this.register(new GitPullTool());
+    this.register(new GitFetchTool());
+    this.register(new GitCheckoutTool());
+    this.register(new GitBranchTool());
+    this.register(new GitMergeTool());
+    this.register(new GitRebaseTool());
+    this.register(new GitStashTool());
+    
+    // Register web tool
+    this.register(new WebSearchTool());
+    
+    // Register notebook tools
+    this.register(new NotebookReadTool());
+    this.register(new NotebookEditTool());
+    
+    // Register dependency tools
+    this.register(new ReadPackageManifestTool());
+    this.register(new AddDependencyTool());
+    this.register(new RemoveDependencyTool());
+    
+    // Register formatter tools
+    this.register(new FormatFileTool());
+    this.register(new FormatDirectoryTool());
+    this.register(new ListFormattersTool());
+    this.register(new CheckFormattingTool());
+    
+    // Register linter tools
+    this.register(new LintFileTool());
+    this.register(new LintDirectoryTool());
+    this.register(new ListLintersTool());
   }
 }

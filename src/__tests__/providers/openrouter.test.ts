@@ -2,9 +2,9 @@
  * Unit tests for OpenRouterProvider
  */
 
-import { OpenRouterProvider } from "../providers/openrouter";
-import { ProviderNotConfiguredError } from "../types/provider";
-import { createProviderByName } from "../providers/factory";
+import { OpenRouterProvider } from "../../providers/openrouter";
+import { ProviderNotConfiguredError } from "../../types/provider";
+import { createProviderByName } from "../../providers/factory";
 
 describe("OpenRouterProvider", () => {
   test("can be created", () => {
