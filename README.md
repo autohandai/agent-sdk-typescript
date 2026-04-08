@@ -23,7 +23,7 @@ const agent = new Agent(
 // Set up the provider
 agent.setProvider(new OpenRouterProvider(
   process.env.AUTOHAND_API_KEY || "your-api-key",
-  "anthropic/claude-3-opus"
+  "z-ai/glm-5.1"
 ));
 
 // Run the agent
@@ -38,7 +38,7 @@ Configure the SDK using environment variables:
 ```bash
 export AUTOHAND_PROVIDER=openrouter
 export AUTOHAND_API_KEY=your-api-key
-export AUTOHAND_MODEL=anthropic/claude-3-opus
+export AUTOHAND_MODEL=z-ai/glm-5.1
 ```
 
 Or configure programmatically:

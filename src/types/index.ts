@@ -4,93 +4,113 @@
  */
 
 /**
+ * Branded type for tool call IDs to prevent mixing with other strings.
+ */
+export type ToolCallId = string & { readonly __brand: 'ToolCallId' };
+
+/**
+ * Branded type for session IDs to prevent mixing with other strings.
+ */
+export type SessionId = string & { readonly __brand: 'SessionId' };
+
+/**
+ * Branded type for model identifiers to prevent mixing with other strings.
+ */
+export type ModelId = string & { readonly __brand: 'ModelId' };
+
+/**
  * Available tools. Values match CLI action names exactly.
  */
-export enum Tool {
-  // Filesystem
-  READ_FILE = "read_file",
-  WRITE_FILE = "write_file",
-  EDIT_FILE = "edit_file",
-  APPLY_PATCH = "apply_patch",
-  FIND = "find",
-  GLOB = "glob",
-  SEARCH_IN_FILES = "search_in_files",
-  
-  // Command
-  BASH = "bash",
-  
-  // Git
-  GIT_STATUS = "git_status",
-  GIT_DIFF = "git_diff",
-  GIT_LOG = "git_log",
-  GIT_COMMIT = "git_commit",
-  GIT_ADD = "git_add",
-  GIT_RESET = "git_reset",
-  GIT_PUSH = "git_push",
-  GIT_PULL = "git_pull",
-  GIT_FETCH = "git_fetch",
-  GIT_CHECKOUT = "git_checkout",
-  GIT_SWITCH = "git_switch",
-  GIT_BRANCH = "git_branch",
-  GIT_MERGE = "git_merge",
-  GIT_REBASE = "git_rebase",
-  GIT_STASH = "git_stash",
-  GIT_APPLY_PATCH = "git_apply_patch",
-  GIT_WORKTREE_LIST = "git_worktree_list",
-  GIT_WORKTREE_ADD = "git_worktree_add",
-  
-  // Web
-  WEB_SEARCH = "web_search",
-  
-  // Notebook
-  NOTEBOOK_READ = "notebook_read",
-  NOTEBOOK_EDIT = "notebook_edit",
-  
-  // Dependencies
-  READ_PACKAGE_MANIFEST = "read_package_manifest",
-  ADD_DEPENDENCY = "add_dependency",
-  REMOVE_DEPENDENCY = "remove_dependency",
-  
-  // Formatters
-  FORMAT_FILE = "format_file",
-  FORMAT_DIRECTORY = "format_directory",
-  LIST_FORMATTERS = "list_formatters",
-  CHECK_FORMATTING = "check_formatting",
-  
-  // Linters
-  LINT_FILE = "lint_file",
-  LINT_DIRECTORY = "lint_directory",
-  LIST_LINTERS = "list_linters",
-}
+export const TOOL_NAMES = [
+  'read_file',
+  'write_file',
+  'edit_file',
+  'apply_patch',
+  'find',
+  'glob',
+  'search_in_files',
+  'bash',
+  'git_status',
+  'git_diff',
+  'git_log',
+  'git_commit',
+  'git_add',
+  'git_reset',
+  'git_push',
+  'git_pull',
+  'git_fetch',
+  'git_checkout',
+  'git_switch',
+  'git_branch',
+  'git_merge',
+  'git_rebase',
+  'git_stash',
+  'git_apply_patch',
+  'git_worktree_list',
+  'git_worktree_add',
+  'web_search',
+  'notebook_read',
+  'notebook_edit',
+  'read_package_manifest',
+  'add_dependency',
+  'remove_dependency',
+  'format_file',
+  'format_directory',
+  'list_formatters',
+  'check_formatting',
+  'lint_file',
+  'lint_directory',
+  'list_linters',
+] as const;
+
+export type Tool = typeof TOOL_NAMES[number];
 
 /**
  * How the agent handles tool execution approvals.
  */
-export enum PermissionMode {
-  YOLO = "yolo",  // Auto-approve all
-  ASK = "ask",    // Prompt before each action
-  DENY = "deny",  // Block all tool use
-}
+export const PERMISSION_MODES = ['yolo', 'ask', 'deny'] as const;
+export type PermissionMode = typeof PERMISSION_MODES[number];
 
 /**
  * A tool/function call requested by the LLM.
  */
 export interface ToolCall {
-  id: string;
-  name: string;
+  id: ToolCallId;
+  name: Tool;
   arguments: string;  // JSON string
 }
 
 /**
  * A single message in the conversation.
  */
-export interface Message {
-  role: "user" | "assistant" | "system" | "tool";
+export const MESSAGE_ROLES = ['user', 'assistant', 'system', 'tool'] as const;
+export type MessageRole = typeof MESSAGE_ROLES[number];
+
+export interface BaseMessage {
+  role: MessageRole;
   content: string;
-  name?: string;
-  tool_call_id?: string;
+}
+
+export interface UserMessage extends BaseMessage {
+  role: 'user';
+}
+
+export interface AssistantMessage extends BaseMessage {
+  role: 'assistant';
   tool_calls?: ToolCall[];
 }
+
+export interface SystemMessage extends BaseMessage {
+  role: 'system';
+}
+
+export interface ToolMessage extends BaseMessage {
+  role: 'tool';
+  name?: string;
+  tool_call_id?: ToolCallId;
+}
+
+export type Message = UserMessage | AssistantMessage | SystemMessage | ToolMessage;
 
 /**
  * Schema for a tool, used to describe it to the LLM.
@@ -104,11 +124,19 @@ export interface ToolSchema {
 /**
  * Result from executing a tool.
  */
-export interface ToolResult {
-  data?: string;
-  error?: string;
+export interface ToolResultSuccess<T = string> {
+  data: T;
+  error?: never;
   metadata?: Record<string, unknown>;
 }
+
+export interface ToolResultError {
+  data?: never;
+  error: string;
+  metadata?: Record<string, unknown>;
+}
+
+export type ToolResult<T = string> = ToolResultSuccess<T> | ToolResultError;
 
 /**
  * Options controlling agent behavior.
@@ -124,11 +152,19 @@ export interface AgentOptions {
 /**
  * Result from a complete agent run.
  */
-export interface RunResult {
+export interface RunResultSuccess {
   finalOutput: string;
-  session?: Session;
+  session: Session;
   turns: number;
 }
+
+export interface RunResultMaxTurns {
+  finalOutput: 'Max turns reached';
+  session: Session;
+  turns: number;
+}
+
+export type RunResult = RunResultSuccess | RunResultMaxTurns;
 
 /**
  * Response from an LLM provider. Normalized across all providers.
@@ -146,7 +182,7 @@ export interface ChatResponse {
  * A session representing a conversation between user, agent, and tools.
  */
 export interface Session {
-  id: string;
+  id: SessionId;
   messages: Message[];
   workingDirectory: string;
   createdAt: Date;

@@ -19,6 +19,22 @@ export { createProvider, createProviderByName } from "./providers/factory";
 export { ToolDefinition } from "./tools/base";
 export { ToolRegistry, DefaultToolRegistry } from "./tools/registry";
 
+// Validation
+export { 
+  SafeParser, 
+  RuntimeValidator,
+  ToolCallSchema,
+  AgentConfigSchema,
+  PermissionModeSchema,
+  SessionConfigSchema,
+  type ToolCallInput,
+  type AgentConfigInput,
+  type SessionConfigInput
+} from "./validation/schemas";
+
+// Utilities
+export { createBrand, createConstAssertion, createId, type BrandedString, isBranded } from "./utils/branding";
+
 // Filesystem tools
 export { ReadFileTool } from "./tools/filesystem/read";
 export { WriteFileTool } from "./tools/filesystem/write";

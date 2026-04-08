@@ -14,7 +14,7 @@ describe("OpenRouterProvider", () => {
 
   test("modelName adds prefix for models without slash", () => {
     const provider = new OpenRouterProvider("test-key", "test-model");
-    expect(provider.modelName("gpt-4")).toBe("anthropic/gpt-4");
+    expect(provider.modelName("gpt-4")).toBe("z-ai/gpt-4");
   });
 
   test("modelName preserves models with slash", () => {

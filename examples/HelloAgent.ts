@@ -16,7 +16,7 @@ async function main() {
   agent.setProvider(
     new OpenRouterProvider(
       process.env.AUTOHAND_API_KEY || "your-api-key",
-      "anthropic/claude-3-opus"
+      "z-ai/glm-5.1"
     )
   );
 

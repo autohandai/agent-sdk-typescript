@@ -8,7 +8,7 @@ describe("Config", () => {
   test("loads config with defaults", () => {
     const config = loadConfig();
     expect(config.provider).toBe("openrouter");
-    expect(config.model).toBe("your-modelcard-id-here");
+    expect(config.model).toBe("z-ai/glm-5.1");
     expect(config.apiKey).toBeUndefined();
   });
 

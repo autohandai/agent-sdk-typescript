@@ -8,7 +8,7 @@ import { Message, ToolSchema, ChatResponse } from "./index";
 export interface Provider {
   /**
    * Return the full model identifier for this provider.
-   * E.g. OpenRouter prefixes like 'anthropic/your-modelcard-id-here'.
+   * E.g. OpenRouter prefixes like 'z-ai/glm-5.1'.
    */
   modelName(model: string): string;
 

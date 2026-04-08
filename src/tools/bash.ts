@@ -2,8 +2,8 @@
  * Execute shell commands.
  */
 
-import { ToolDefinition } from "./base";
 import { Tool, ToolResult } from "../types";
+import { ToolDefinition, ToolParameterValue } from "./base";
 import { exec } from "child_process";
 import { promisify } from "util";
 
@@ -11,7 +11,7 @@ const execAsync = promisify(exec);
 
 export class BashTool extends ToolDefinition {
   getName(): Tool {
-    return Tool.BASH;
+    return "bash";
   }
 
   getDescription(): string {
@@ -36,26 +36,23 @@ export class BashTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
-    const workDir = (params.work_dir as string) || ".";
+  protected async executeInternal(params: Record<string, ToolParameterValue>): Promise<ToolResult<string>> {
     const command = params.command as string;
+    const workDir = params.work_dir as string;
+
+    if (!command) {
+      return { error: "Command is required" };
+    }
 
     try {
       const { stdout, stderr } = await execAsync(command, {
-        cwd: workDir,
+        cwd: workDir || process.cwd(),
       });
 
-      if (stderr) {
-        return {
-          data: stdout,
-          error: stderr,
-        };
-      }
-
-      return { data: stdout };
+      return { data: stdout, error: stderr || undefined };
     } catch (error) {
       return {
-        error: error instanceof Error ? `Cannot execute command: ${error.message}` : "Cannot execute command",
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }

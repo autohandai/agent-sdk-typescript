@@ -13,7 +13,7 @@ export class OpenRouterProvider implements Provider {
 
   constructor(
     apiKey: string,
-    defaultModel = "your-modelcard-id-here",
+    defaultModel = "z-ai/glm-5.1",
     baseUrl = "https://openrouter.ai/api/v1"
   ) {
     this.apiKey = apiKey;
@@ -25,7 +25,7 @@ export class OpenRouterProvider implements Provider {
     if (model.includes("/")) {
       return model;
     }
-    return `anthropic/${model}`;
+    return `z-ai/${model}`;
   }
 
   async chat(

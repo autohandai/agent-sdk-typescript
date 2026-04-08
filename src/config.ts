@@ -17,7 +17,7 @@ export function loadConfig(): Config {
   return {
     provider: process.env.AUTOHAND_PROVIDER || "openrouter",
     apiKey: process.env.AUTOHAND_API_KEY,
-    model: process.env.AUTOHAND_MODEL || "your-modelcard-id-here",
+    model: process.env.AUTOHAND_MODEL || "z-ai/glm-5.1",
     baseUrl: process.env.AUTOHAND_BASE_URL,
   };
 }
