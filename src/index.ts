@@ -13,6 +13,13 @@ export { loadConfig, config } from "./config";
 
 // Providers
 export { OpenRouterProvider } from "./providers/openrouter";
+export { OllamaProvider } from "./providers/ollama";
+export { OpenAIProvider, type OpenAIConfig } from "./providers/openai";
+export { AzureProvider, type AzureConfig } from "./providers/azure";
+export { ZaiProvider, type ZaiConfig } from "./providers/zai";
+export { LLMGatewayProvider, type LLMGatewayConfig } from "./providers/llmgateway";
+export { LlamaCppProvider, type LlamaCppConfig } from "./providers/llamacpp";
+export { MLXProvider, type MLXConfig } from "./providers/mlx";
 export { createProvider, createProviderByName } from "./providers/factory";
 
 // Tools

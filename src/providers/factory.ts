@@ -1,36 +1,112 @@
 /**
- * Factory for creating provider instances from configuration.
+ * Factory for creating provider instances.
+ * Supports all 7 providers from CLI: openrouter, ollama, openai, llamacpp, mlx, llmgateway, azure, zai
  */
 
 import { Provider } from "../types/provider";
-import { OpenRouterProvider } from "./openrouter";
-import { ProviderNotConfiguredError } from "../types/provider";
 import { Config } from "../config";
+import { OpenRouterProvider } from "./openrouter";
+import { OllamaProvider } from "./ollama";
+import { OpenAIProvider, type OpenAIConfig } from "./openai";
+import { AzureProvider, type AzureConfig } from "./azure";
+import { ZaiProvider, type ZaiConfig } from "./zai";
+import { LLMGatewayProvider, type LLMGatewayConfig } from "./llmgateway";
+import { LlamaCppProvider, type LlamaCppConfig } from "./llamacpp";
+import { MLXProvider, type MLXConfig } from "./mlx";
 
-export function createProvider(config: Config): Provider {
-  return createProviderByName(config.provider, config.apiKey, config.model);
+/**
+ * Error thrown when provider is not configured.
+ */
+export class ProviderNotConfiguredError extends Error {
+  constructor(providerName: string) {
+    super(`Provider '${providerName}' is not configured`);
+    this.name = 'ProviderNotConfiguredError';
+  }
 }
 
-export function createProviderByName(
-  providerName: string,
-  apiKey?: string,
-  model?: string
-): Provider {
-  const name = providerName || "openrouter";
-
-  switch (name.toLowerCase()) {
-    case "openrouter":
-      if (!apiKey) {
-        throw new ProviderNotConfiguredError("openrouter");
+/**
+ * Create a provider instance based on configuration.
+ */
+export function createProvider(config: Config): Provider {
+  switch (config.provider) {
+    case 'openrouter':
+      if (!config.openrouter?.apiKey) {
+        throw new ProviderNotConfiguredError('openrouter');
       }
-      return new OpenRouterProvider(apiKey, model);
-    case "openai":
-      // TODO: Implement OpenAI provider
-      throw new Error("OpenAI provider not yet implemented");
-    case "ollama":
-      // TODO: Implement Ollama provider
-      throw new Error("Ollama provider not yet implemented");
+      return new OpenRouterProvider(config.openrouter);
+
+    case 'ollama':
+      if (!config.ollama) {
+        throw new ProviderNotConfiguredError('ollama');
+      }
+      return new OllamaProvider(
+        config.ollama.baseUrl || "http://localhost:11434",
+        config.ollama.model || "llama2"
+      );
+
+    case 'openai':
+      if (!config.openai?.apiKey) {
+        throw new ProviderNotConfiguredError('openai');
+      }
+      return new OpenAIProvider(config.openai);
+
+    case 'azure':
+      if (!config.azure?.apiKey || !config.azure?.resourceName || !config.azure?.deploymentName) {
+        throw new ProviderNotConfiguredError('azure');
+      }
+      return new AzureProvider(config.azure);
+
+    case 'zai':
+      if (!config.zai?.apiKey) {
+        throw new ProviderNotConfiguredError('zai');
+      }
+      return new ZaiProvider(config.zai);
+
+    case 'llmgateway':
+      if (!config.llmgateway?.apiKey) {
+        throw new ProviderNotConfiguredError('llmgateway');
+      }
+      return new LLMGatewayProvider(config.llmgateway);
+
+    case 'llamacpp':
+      if (!config.llamacpp) {
+        throw new ProviderNotConfiguredError('llamacpp');
+      }
+      return new LlamaCppProvider(config.llamacpp);
+
+    case 'mlx':
+      if (!config.mlx) {
+        throw new ProviderNotConfiguredError('mlx');
+      }
+      return new MLXProvider(config.mlx);
+
     default:
-      throw new ProviderNotConfiguredError(name);
+      throw new ProviderNotConfiguredError(config.provider);
+  }
+}
+
+/**
+ * Create a provider by name with default configuration.
+ */
+export function createProviderByName(providerName: string, apiKey: string): Provider {
+  switch (providerName) {
+    case 'openrouter':
+      return new OpenRouterProvider({ apiKey });
+    case 'ollama':
+      return new OllamaProvider();
+    case 'openai':
+      return new OpenAIProvider({ apiKey });
+    case 'azure':
+      throw new ProviderNotConfiguredError('azure requires additional configuration');
+    case 'zai':
+      return new ZaiProvider({ apiKey });
+    case 'llmgateway':
+      return new LLMGatewayProvider({ apiKey });
+    case 'llamacpp':
+      throw new ProviderNotConfiguredError('llamacpp requires additional configuration');
+    case 'mlx':
+      return new MLXProvider({});
+    default:
+      throw new ProviderNotConfiguredError(providerName);
   }
 }

@@ -33,21 +33,98 @@ console.log(result);
 
 ## Configuration
 
-Configure the SDK using environment variables:
+Autohand Code SDK supports 7 providers: **openrouter**, **ollama**, **openai**, **llamacpp**, **mlx**, **llmgateway**, **azure**, and **zai**.
+
+### Environment Variables
 
 ```bash
+# Provider selection
 export AUTOHAND_PROVIDER=openrouter
+
+# API Key for selected provider
 export AUTOHAND_API_KEY=your-api-key
+
+# Model name (provider-specific)
+export AUTOHAND_MODEL=z-ai/glm-5.1
+
+# Optional: Custom base URL
+export AUTOHAND_BASE_URL=https://custom-api.example.com
+```
+
+### Provider-Specific Configuration
+
+#### OpenRouter (Default)
+```bash
+export AUTOHAND_PROVIDER=openrouter
+export AUTOHAND_API_KEY=sk-or-v1-...
 export AUTOHAND_MODEL=z-ai/glm-5.1
 ```
 
-Or configure programmatically:
+#### OpenAI
+```bash
+export AUTOHAND_PROVIDER=openai
+export AUTOHAND_API_KEY=sk-...
+export AUTOHAND_MODEL=gpt-4
+```
+
+#### Azure OpenAI
+```bash
+export AUTOHAND_PROVIDER=azure
+export AUTOHAND_API_KEY=your-api-key
+export AUTOHAND_MODEL=gpt-4
+export AUTOHAND_AZURE_RESOURCE_NAME=your-resource-name
+export AUTOHAND_AZURE_DEPLOYMENT_NAME=your-deployment-name
+```
+
+#### Ollama (Local)
+```bash
+export AUTOHAND_PROVIDER=ollama
+export AUTOHAND_MODEL=llama2
+export AUTOHAND_OLLAMA_BASE_URL=http://localhost:11434
+```
+
+#### Z-AI
+```bash
+export AUTOHAND_PROVIDER=zai
+export AUTOHAND_API_KEY=your-api-key
+export AUTOHAND_MODEL=glm-5.1
+```
+
+#### LLM Gateway
+```bash
+export AUTOHAND_PROVIDER=llmgateway
+export AUTOHAND_API_KEY=your-api-key
+export AUTOHAND_MODEL=llama-3.1-8b
+```
+
+#### Llama.cpp (Local)
+```bash
+export AUTOHAND_PROVIDER=llamacpp
+export AUTOHAND_MODEL=llama-3-8b-instruct
+export AUTOHAND_LLAMACPP_BASE_URL=http://localhost:8080
+```
+
+#### MLX (Apple Silicon)
+```bash
+export AUTOHAND_PROVIDER=mlx
+export AUTOHAND_MODEL=mlx-lm
+export AUTOHAND_MLX_BASE_URL=http://localhost:8080
+```
+
+### Programmatic Configuration
 
 ```typescript
-import { loadConfig } from "@autohandai/agent-sdk";
+import { loadConfig, createProvider } from "@autohandai/agent-sdk";
 
+// Load from environment
 const config = loadConfig();
-// config.provider, config.apiKey, config.model
+
+// Create provider manually
+const provider = createProvider(config);
+
+// Or create by name
+const openRouterProvider = createProviderByName("openrouter", "your-api-key");
+const ollamaProvider = createProviderByName("ollama"); // No API key needed for local
 ```
 
 ## Available Tools
