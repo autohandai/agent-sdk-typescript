@@ -5,13 +5,13 @@ Build AI agents with Autohand Code using TypeScript.
 ## Installation
 
 ```bash
-npm install autohand-agents
+npm install @autohandai/agent-sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { Agent, Runner, Tool, OpenRouterProvider } from "autohand-agents";
+import { Agent, Runner, Tool, OpenRouterProvider } from "@autohandai/agent-sdk";
 
 // Create an agent
 const agent = new Agent(
@@ -44,7 +44,7 @@ export AUTOHAND_MODEL=anthropic/claude-3-opus
 Or configure programmatically:
 
 ```typescript
-import { loadConfig } from "autohand-agents";
+import { loadConfig } from "@autohandai/agent-sdk";
 
 const config = loadConfig();
 // config.provider, config.apiKey, config.model
@@ -94,7 +94,7 @@ const config = loadConfig();
 Create custom tools by extending `ToolDefinition`:
 
 ```typescript
-import { ToolDefinition, Tool, ToolResult } from "autohand-agents";
+import { ToolDefinition, Tool, ToolResult } from "@autohandai/agent-sdk";
 
 class MyCustomTool extends ToolDefinition {
   getName(): Tool {

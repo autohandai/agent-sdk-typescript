@@ -2,7 +2,7 @@
  * Simple example of using the Autohand Code Agent SDK
  */
 
-import { Agent, Runner, Tool, OpenRouterProvider } from "../src/index";
+import { Agent, Runner, Tool, OpenRouterProvider } from "@autohandai/agent-sdk";
 
 async function main() {
   // Create an agent

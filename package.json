@@ -1,5 +1,5 @@
 {
-  "name": "autohand-agents",
+  "name": "@autohandai/agent-sdk",
   "version": "0.1.0",
   "description": "Autohand Code Agent SDK for TypeScript",
   "main": "dist/index.js",
