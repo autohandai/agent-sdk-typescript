@@ -1,26 +1,43 @@
 # Autohand Code Agent SDK for TypeScript
 
-Build AI agents with Autohand Code using TypeScript.
+[![npm version](https://badge.fury.io/js/@autohandai%2Fagent-sdk.svg)](https://www.npmjs.com/package/@autohandai/agent-sdk)
+[![License](https://img.shields.io/npm/l/@autohandai/agent-sdk)](LICENSE)
+[![Node.js Version](https://img.shields.io/node/v/@autohandai/agent-sdk)](package.json)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
 
-## Installation
+> Build production-ready AI agents with Autohand Code using TypeScript.
+
+The Autohand Code Agent SDK for TypeScript provides a robust, type-safe way to build AI agents that can interact with your codebase, execute tools, and perform complex tasks. Built with performance, reliability, and developer experience in mind.
+
+## ✨ Features
+
+- **🚀 Production-Ready**: Comprehensive error handling, timeout management, and retry logic
+- **🔒 Type-Safe**: Full TypeScript support with Zod runtime validation
+- **🛠️ Extensible**: Easy-to-use tool system for custom functionality
+- **📊 Observability**: Structured logging and metrics for debugging and monitoring
+- **⚡ Performance**: Optimized with schema caching and efficient resource management
+- **🔌 Multi-Provider**: Support for OpenRouter, OpenAI, Azure, Ollama, and more
+- **🧪 Well-Tested**: Comprehensive test coverage including integration tests
+
+## 📦 Installation
 
 ```bash
 npm install @autohandai/agent-sdk
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
 ```typescript
 import { Agent, Runner, OpenRouterProvider, DefaultToolRegistry } from "@autohandai/agent-sdk";
 
-// Create an agent
+// Create an agent with tools
 const agent = new Agent(
   "Assistant",
   "You are a helpful coding assistant.",
   DefaultToolRegistry.getAll()
 );
 
-// Set up the provider
+// Configure the provider with timeout and retry options
 agent.setProvider(new OpenRouterProvider(
   process.env.AUTOHAND_API_KEY || "your-api-key",
   "z-ai/glm-5.1"
@@ -31,9 +48,16 @@ const result = await Runner.runSync(agent, "Read the package.json file");
 console.log(result);
 ```
 
-## Configuration
+## 📚 Documentation
 
-Autohand Code SDK supports 7 providers: **openrouter**, **ollama**, **openai**, **llamacpp**, **mlx**, **llmgateway**, **azure**, and **zai**.
+- **[API Reference](docs/API.md)** - Complete API documentation
+- **[Migration Guide](MIGRATION.md)** - Guide for upgrading between versions
+- **[Environment Variables](docs/ENVIRONMENT_VARIABLES.md)** - Configuration reference
+- **[Examples](../examples/)** - Example applications
+
+## ⚙️ Configuration
+
+Autohand Code SDK supports 8 providers: **openrouter**, **ollama**, **openai**, **llamacpp**, **mlx**, **llmgateway**, **azure**, and **zai**.
 
 ### Environment Variables
 
@@ -127,7 +151,57 @@ const openRouterProvider = createProviderByName("openrouter", "your-api-key");
 const ollamaProvider = createProviderByName("ollama"); // No API key needed for local
 ```
 
-## Available Tools
+## 🎯 Advanced Features
+
+### Timeout Handling
+
+All provider requests support configurable timeouts to prevent hanging:
+
+```typescript
+import { ConsoleLogger } from "@autohandai/agent-sdk";
+
+const logger = new ConsoleLogger();
+agent.setProvider(new OpenRouterProvider("api-key", "model"));
+
+// Run with custom timeout (default: 30s)
+const result = await Runner.run(agent, "Analyze this code");
+```
+
+### Retry Logic
+
+Transient failures are automatically retried with exponential backoff:
+
+- **Retryable errors**: 408 (timeout), 429 (rate limit), 500+ (server errors)
+- **Non-retryable errors**: 400, 401, 403, 404
+- **Default**: 3 retries with exponential backoff (100ms initial, 10s max)
+
+### Runtime Validation
+
+All provider responses and tool parameters are validated using Zod schemas:
+
+```typescript
+// Tool parameters are validated automatically
+class MyTool extends ToolDefinition {
+  getParameterSchema(): z.ZodSchema {
+    return z.object({
+      path: z.string().min(1),
+      count: z.number().min(0).max(100),
+    });
+  }
+}
+```
+
+### Resource Cleanup
+
+Automatic resource cleanup prevents memory leaks:
+
+```typescript
+// Resources are automatically cleaned up on completion or error
+const result = await Runner.run(agent, "Process data");
+// SessionManager ensures cleanup even if an error occurs
+```
+
+## 🛠️ Available Tools
 
 ### Filesystem
 - `READ_FILE` - Read file contents
@@ -180,12 +254,13 @@ const ollamaProvider = createProviderByName("ollama"); // No API key needed for 
 - `LINT_DIRECTORY` - Lint all files in a directory (requires linter CLI)
 - `LIST_LINTERS` - List available code linters
 
-## Custom Tools
+## 🔧 Custom Tools
 
-Create custom tools by extending `ToolDefinition`:
+Create custom tools by extending `ToolDefinition` with Zod validation:
 
 ```typescript
 import { ToolDefinition, ToolResult } from "@autohandai/agent-sdk";
+import { z } from "zod";
 
 class MyCustomTool extends ToolDefinition {
   getName(): string {
@@ -206,18 +281,84 @@ class MyCustomTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  // Override to provide custom Zod validation
+  getParameterSchema(): z.ZodSchema {
+    return z.object({
+      param1: z.string().min(1),
+      param2: z.number().optional(),
+    });
+  }
+
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult> {
     // Your tool logic here
     return { data: "Tool executed successfully" };
   }
 }
 ```
 
-## CLI Integration
+## 🛡️ Error Handling
 
-This SDK works seamlessly with the [Autohand Code CLI](https://github.com/autohandai/code-cli).
+The SDK provides comprehensive error handling with custom error classes:
 
-## Development
+```typescript
+import { 
+  TimeoutError, 
+  RetryExhaustedError, 
+  ValidationError, 
+  ProviderError,
+  isRetryableError 
+} from "@autohandai/agent-sdk";
+
+try {
+  await Runner.run(agent, prompt);
+} catch (error) {
+  if (error instanceof TimeoutError) {
+    console.log("Request timed out");
+  } else if (error instanceof RetryExhaustedError) {
+    console.log("Max retries exceeded");
+  } else if (error instanceof ValidationError) {
+    console.log("Validation failed");
+  } else if (error instanceof ProviderError) {
+    console.log("Provider error");
+  }
+}
+```
+
+## ⚡ Performance
+
+The SDK is optimized for production use:
+
+- **Schema Caching**: Tool schemas are cached to avoid redundant computation
+- **Resource Management**: Automatic cleanup prevents memory leaks
+- **Efficient Validation**: Zod provides fast runtime validation
+- **Connection Pooling**: Optimized HTTP connections
+
+## 🧪 Testing
+
+The SDK includes comprehensive test coverage:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+Test suites include:
+- Unit tests for individual components
+- Integration tests with mocked providers
+- Error scenario tests
+- Edge case and concurrent operation tests
+
+## 🔗 CLI Integration
+
+This SDK works seamlessly with the [Autohand Code CLI](https://autohand.ai/code/).
+
+## 💻 Development
 
 ```bash
 # Install dependencies
@@ -232,16 +373,50 @@ npm test
 # Run tests with coverage
 npm run test:coverage
 
+# Run tests in watch mode
+npm run test:watch
+
 # Lint
 npm run lint
+
+# Lint with auto-fix
+npm run lint:fix
 ```
 
-## License
+### Requirements
 
-Apache 2.0
+- **Node.js**: >=16.0.0
+- **TypeScript**: >=5.0.0
 
-## Links
+## 📄 License
 
-- [Autohand Code CLI](https://github.com/autohandai/code-cli)
-- [Python SDK](https://github.com/autohandai/agent-sdk-python)
-- [Java SDK](https://github.com/autohandai/agent-sdk-java)
+Apache 2.0 - see [LICENSE](LICENSE) for details.
+
+## 🔗 Links
+
+- **[Homepage](https://autohand.ai/code/)** - Autohand Code official website
+- **[Repository](https://github.com/autohandai/agent-sdk-typescript)** - GitHub repository
+- **[Documentation](docs/)** - Complete documentation
+- **[API Reference](docs/API.md)** - Full API documentation
+- **[Migration Guide](MIGRATION.md)** - Upgrade guide
+- **[Environment Variables](docs/ENVIRONMENT_VARIABLES.md)** - Configuration reference
+- **[Issues](https://github.com/autohandai/agent-sdk-typescript/issues)** - Bug reports and feature requests
+- **[Autohand Code CLI](https://autohand.ai/code/)** - Command-line interface
+- **[Python SDK](https://github.com/autohandai/agent-sdk-python)** - Python implementation
+- **[Java SDK](https://github.com/autohandai/agent-sdk-java)** - Java implementation
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our contributing guidelines and submit pull requests to the [GitHub repository](https://github.com/autohandai/agent-sdk-typescript).
+
+## 📞 Support
+
+- 📖 [Documentation](docs/)
+- 🐛 [Report a Bug](https://github.com/autohandai/agent-sdk-typescript/issues/new?template=bug_report.md)
+- 💡 [Request a Feature](https://github.com/autohandai/agent-sdk-typescript/issues/new?template=feature_request.md)
+- 💬 [Discussions](https://github.com/autohandai/agent-sdk-typescript/discussions)
+
+---
+
+Built with ❤️ by [Autohand AI](https://autohand.ai/code/)
+

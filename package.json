@@ -2,6 +2,7 @@
   "name": "@autohandai/agent-sdk",
   "version": "0.8.0",
   "description": "Autohand Code Agent SDK for TypeScript",
+  "private": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
