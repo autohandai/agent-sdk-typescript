@@ -4,3 +4,4 @@ coverage/
 *.log
 .DS_Store
 .env
+SDK_IMPROVEMENTS_SPEC.md

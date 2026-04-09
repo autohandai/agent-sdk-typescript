@@ -1,10 +1,13 @@
 /**
  * Abstract base class for tool definitions.
- * Uses generic constraints for better type safety.
+ * Uses Zod for runtime parameter validation.
+ * Implements Disposable for resource cleanup.
  */
 
 import { Tool, ToolResult } from "../types";
-import { RuntimeValidator } from "../validation/schemas";
+import { z } from "zod";
+import { ValidationError } from "../errors";
+import { Disposable } from "../utils/disposable";
 
 /**
  * Type constraint for tool parameter values.
@@ -18,7 +21,7 @@ export type ToolParameterValue =
   | boolean[] 
   | Record<string, unknown>;
 
-export abstract class ToolDefinition {
+export abstract class ToolDefinition implements Disposable {
   /**
    * Get the tool name as a string.
    */
@@ -30,9 +33,19 @@ export abstract class ToolDefinition {
   abstract getDescription(): string;
 
   /**
-   * Get the tool parameters schema.
+   * Get the tool parameters schema in JSON Schema format for LLM.
    */
   abstract getParameters(): Record<string, unknown>;
+
+  /**
+   * Get the Zod schema for runtime parameter validation.
+   * Override this to provide custom validation logic.
+   * Default implementation converts JSON Schema to basic Zod schema.
+   */
+  getParameterSchema(): z.ZodSchema<Record<string, unknown>> {
+    const jsonSchema = this.getParameters();
+    return this.jsonSchemaToZod(jsonSchema);
+  }
 
   /**
    * Execute the tool with given parameters.
@@ -41,14 +54,18 @@ export abstract class ToolDefinition {
    * @throws {Error} When tool execution fails
    */
   async execute(params: Record<string, unknown>): Promise<ToolResult<string>> {
-    // Validate parameters before execution
-    const validationError = this.validateParameters(params);
-    if (validationError) {
-      return { error: validationError };
+    // Validate parameters before execution using Zod
+    const schema = this.getParameterSchema();
+    const result = schema.safeParse(params);
+
+    if (!result.success) {
+      return {
+        error: `Parameter validation failed: ${result.error.message}`
+      };
     }
 
     try {
-      return await this.executeInternal(params);
+      return await this.executeInternal(result.data);
     } catch (error) {
       return {
         error: error instanceof Error ? error.message : String(error)
@@ -58,51 +75,59 @@ export abstract class ToolDefinition {
 
   /**
    * Internal execution method to be implemented by subclasses.
+   * Receives validated parameters.
    */
   protected abstract executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>>;
 
   /**
-   * Validate tool parameters before execution.
+   * Convert JSON Schema to basic Zod schema for validation.
+   * This is a simplified conversion - override getParameterSchema() for complex validation.
    */
-  protected validateParameters(params: Record<string, unknown>): string | null {
-    const schema = this.getParameters();
-    
-    // Check required parameters
-    if (schema.required && Array.isArray(schema.required)) {
-      for (const required of schema.required) {
-        if (!(required in params)) {
-          return `Missing required parameter: ${required}`;
-        }
-      }
-    }
-    
-    // Check parameter types
-    if (schema.properties && typeof schema.properties === 'object') {
-      for (const [key, value] of Object.entries(params)) {
-        const paramSchema = (schema.properties as Record<string, unknown>)[key];
-        if (paramSchema && typeof paramSchema === 'object') {
-          const paramDef = paramSchema as Record<string, unknown>;
-          const allowedTypes = this.getAllowedTypes(paramDef);
-          if (allowedTypes && !allowedTypes.includes(typeof value)) {
-            return `Invalid type for parameter ${key}: expected ${allowedTypes.join(' or ')}, got ${typeof value}`;
+  private jsonSchemaToZod(jsonSchema: Record<string, unknown>): z.ZodSchema<Record<string, unknown>> {
+    const shape: Record<string, z.ZodTypeAny> = {};
+
+    if (jsonSchema.properties && typeof jsonSchema.properties === 'object') {
+      const properties = jsonSchema.properties as Record<string, unknown>;
+      
+      for (const [key, propSchema] of Object.entries(properties)) {
+        if (typeof propSchema === 'object' && propSchema !== null) {
+          const prop = propSchema as Record<string, unknown>;
+          let zodType: z.ZodTypeAny;
+
+          // Convert type to Zod
+          if (prop.type === 'string') {
+            zodType = z.string();
+          } else if (prop.type === 'number') {
+            zodType = z.number();
+          } else if (prop.type === 'boolean') {
+            zodType = z.boolean();
+          } else if (prop.type === 'array') {
+            zodType = z.array(z.any());
+          } else if (prop.type === 'object') {
+            zodType = z.record(z.any());
+          } else {
+            zodType = z.any();
           }
+
+          // Handle optional fields
+          const isRequired = jsonSchema.required && 
+                           Array.isArray(jsonSchema.required) && 
+                           jsonSchema.required.includes(key);
+          
+          shape[key] = isRequired ? zodType : zodType.optional();
         }
       }
     }
-    
-    return null;
+
+    return z.object(shape).passthrough();
   }
 
   /**
-   * Get allowed types for a parameter schema.
+   * Dispose of any resources held by this tool.
+   * Override this method to clean up tool-specific resources like file handles, timers, etc.
+   * Default implementation is a no-op.
    */
-  private getAllowedTypes(paramDef: Record<string, unknown>): string[] | null {
-    if (Array.isArray(paramDef.type)) {
-      return paramDef.type as string[];
-    }
-    if (typeof paramDef.type === 'string') {
-      return [paramDef.type];
-    }
-    return null;
+  dispose(): void {
+    // Default implementation - override in subclasses if needed
   }
 }
