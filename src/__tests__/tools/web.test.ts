@@ -3,13 +3,12 @@
  */
 
 import { WebSearchTool } from "../../tools/web";
-import { Tool } from "../../types";
 
 describe("Web Tools", () => {
   describe("WebSearchTool", () => {
     it("should have correct name", () => {
       const tool = new WebSearchTool();
-      expect(tool.getName()).toBe(Tool.WEB_SEARCH);
+      expect(tool.getName()).toBe("web_search");
     });
 
     it("should have description", () => {

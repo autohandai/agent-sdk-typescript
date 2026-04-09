@@ -7,13 +7,12 @@ import {
   LintDirectoryTool,
   ListLintersTool,
 } from "../../tools/linters";
-import { Tool } from "../../types";
 
 describe("Linter Tools", () => {
   describe("LintFileTool", () => {
     it("should have correct name", () => {
       const tool = new LintFileTool();
-      expect(tool.getName()).toBe(Tool.LINT_FILE);
+      expect(tool.getName()).toBe("lint_file");
     });
 
     it("should have description", () => {
@@ -31,7 +30,7 @@ describe("Linter Tools", () => {
   describe("LintDirectoryTool", () => {
     it("should have correct name", () => {
       const tool = new LintDirectoryTool();
-      expect(tool.getName()).toBe(Tool.LINT_DIRECTORY);
+      expect(tool.getName()).toBe("lint_directory");
     });
 
     it("should have description", () => {
@@ -49,7 +48,7 @@ describe("Linter Tools", () => {
   describe("ListLintersTool", () => {
     it("should have correct name", () => {
       const tool = new ListLintersTool();
-      expect(tool.getName()).toBe(Tool.LIST_LINTERS);
+      expect(tool.getName()).toBe("list_linters");
     });
 
     it("should have description", () => {

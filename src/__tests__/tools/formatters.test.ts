@@ -8,13 +8,12 @@ import {
   ListFormattersTool,
   CheckFormattingTool,
 } from "../../tools/formatters";
-import { Tool } from "../../types";
 
 describe("Formatter Tools", () => {
   describe("FormatFileTool", () => {
     it("should have correct name", () => {
       const tool = new FormatFileTool();
-      expect(tool.getName()).toBe(Tool.FORMAT_FILE);
+      expect(tool.getName()).toBe("format_file");
     });
 
     it("should have description", () => {
@@ -32,7 +31,7 @@ describe("Formatter Tools", () => {
   describe("FormatDirectoryTool", () => {
     it("should have correct name", () => {
       const tool = new FormatDirectoryTool();
-      expect(tool.getName()).toBe(Tool.FORMAT_DIRECTORY);
+      expect(tool.getName()).toBe("format_directory");
     });
 
     it("should have description", () => {
@@ -50,7 +49,7 @@ describe("Formatter Tools", () => {
   describe("ListFormattersTool", () => {
     it("should have correct name", () => {
       const tool = new ListFormattersTool();
-      expect(tool.getName()).toBe(Tool.LIST_FORMATTERS);
+      expect(tool.getName()).toBe("list_formatters");
     });
 
     it("should have description", () => {
@@ -70,7 +69,7 @@ describe("Formatter Tools", () => {
   describe("CheckFormattingTool", () => {
     it("should have correct name", () => {
       const tool = new CheckFormattingTool();
-      expect(tool.getName()).toBe(Tool.CHECK_FORMATTING);
+      expect(tool.getName()).toBe("check_formatting");
     });
 
     it("should have description", () => {

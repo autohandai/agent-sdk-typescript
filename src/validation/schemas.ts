@@ -42,11 +42,7 @@ export const AgentConfigSchema = z.object({
 /**
  * Schema for permission mode validation.
  */
-export const PermissionModeSchema = z.enum(PERMISSION_MODES, {
-  errorMap: (issue) => ({
-    message: `Invalid permission mode: ${issue.received}`,
-  }),
-});
+export const PermissionModeSchema = z.enum(PERMISSION_MODES);
 
 /**
  * Schema for session creation validation.

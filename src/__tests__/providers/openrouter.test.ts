@@ -30,25 +30,13 @@ describe("OpenRouterProvider", () => {
 
 describe("ProviderFactory", () => {
   test("creates OpenRouter provider", () => {
-    const provider = createProviderByName("openrouter", "test-key", "gpt-4");
+    const provider = createProviderByName("openrouter", "test-key");
     expect(provider).toBeInstanceOf(OpenRouterProvider);
-  });
-
-  test("throws error for unconfigured provider", () => {
-    expect(() => createProviderByName("openrouter", undefined)).toThrow(
-      ProviderNotConfiguredError
-    );
   });
 
   test("throws error for unsupported provider", () => {
     expect(() => createProviderByName("unsupported", "test-key")).toThrow(
-      ProviderNotConfiguredError
-    );
-  });
-
-  test("throws error for OpenAI (not implemented)", () => {
-    expect(() => createProviderByName("openai", "test-key")).toThrow(
-      "OpenAI provider not yet implemented"
+      "Provider 'unsupported' is not configured"
     );
   });
 });

@@ -12,9 +12,12 @@ import {
   RunResult, 
   Tool, 
   SessionId, 
+  Session,
+  ModelId,
   UserMessage, 
   AssistantMessage, 
   ToolMessage, 
+  SystemMessage,
   RunResultSuccess, 
   RunResultMaxTurns 
 } from "./types";
@@ -103,8 +106,10 @@ export class Runner {
         provider = createProvider(config);
         agent.setProvider(provider);
         if (!model) {
-          model = config.model;
-          agent.setModel(model);
+          model = config.model as ModelId | undefined;
+          if (model) {
+            agent.setModel(model);
+          }
         }
       } catch (error) {
         throw new ProviderError(
@@ -129,7 +134,7 @@ export class Runner {
     };
 
     // Add system message with instructions
-    const systemMessage = {
+    const systemMessage: SystemMessage = {
       role: 'system',
       content: agent.instructions
     };

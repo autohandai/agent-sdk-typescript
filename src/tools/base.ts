@@ -20,9 +20,9 @@ export type ToolParameterValue =
 
 export abstract class ToolDefinition {
   /**
-   * Get the tool enum value.
+   * Get the tool name as a string.
    */
-  abstract getName(): Tool;
+  abstract getName(): string;
 
   /**
    * Get the tool description.
@@ -40,7 +40,7 @@ export abstract class ToolDefinition {
    * @returns {Promise<ToolResult<string>>} Tool execution result
    * @throws {Error} When tool execution fails
    */
-  async execute(params: Record<string, ToolParameterValue>): Promise<ToolResult<string>> {
+  async execute(params: Record<string, unknown>): Promise<ToolResult<string>> {
     // Validate parameters before execution
     const validationError = this.validateParameters(params);
     if (validationError) {
@@ -59,16 +59,16 @@ export abstract class ToolDefinition {
   /**
    * Internal execution method to be implemented by subclasses.
    */
-  protected abstract executeInternal(params: Record<string, ToolParameterValue>): Promise<ToolResult<string>>;
+  protected abstract executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>>;
 
   /**
    * Validate tool parameters before execution.
    */
-  protected validateParameters(params: Record<string, ToolParameterValue>): string | null {
+  protected validateParameters(params: Record<string, unknown>): string | null {
     const schema = this.getParameters();
     
     // Check required parameters
-    if (schema.required) {
+    if (schema.required && Array.isArray(schema.required)) {
       for (const required of schema.required) {
         if (!(required in params)) {
           return `Missing required parameter: ${required}`;
@@ -77,9 +77,9 @@ export abstract class ToolDefinition {
     }
     
     // Check parameter types
-    if (schema.properties) {
+    if (schema.properties && typeof schema.properties === 'object') {
       for (const [key, value] of Object.entries(params)) {
-        const paramSchema = schema.properties[key];
+        const paramSchema = (schema.properties as Record<string, unknown>)[key];
         if (paramSchema && typeof paramSchema === 'object') {
           const paramDef = paramSchema as Record<string, unknown>;
           const allowedTypes = this.getAllowedTypes(paramDef);

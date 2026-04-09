@@ -12,8 +12,8 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 
 export class ApplyPatchTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.APPLY_PATCH;
+  getName(): string {
+    return "apply_patch";
   }
 
   getDescription(): string {
@@ -42,7 +42,7 @@ export class ApplyPatchTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
     const patch = params.patch as string;
@@ -72,8 +72,8 @@ export class ApplyPatchTool extends ToolDefinition {
 }
 
 export class FindTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.FIND;
+  getName(): string {
+    return "find";
   }
 
   getDescription(): string {
@@ -102,7 +102,7 @@ export class FindTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const pattern = params.pattern as string;
     const maxDepth = params.max_depth as number;
@@ -124,8 +124,8 @@ export class FindTool extends ToolDefinition {
 }
 
 export class GlobTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GLOB;
+  getName(): string {
+    return "glob";
   }
 
   getDescription(): string {
@@ -150,7 +150,7 @@ export class GlobTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const pattern = params.pattern as string;
 
@@ -169,8 +169,8 @@ export class GlobTool extends ToolDefinition {
 }
 
 export class SearchInFilesTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.SEARCH_IN_FILES;
+  getName(): string {
+    return "search_in_files";
   }
 
   getDescription(): string {
@@ -199,7 +199,7 @@ export class SearchInFilesTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const pattern = params.pattern as string;
     const filePattern = params.file_pattern as string;

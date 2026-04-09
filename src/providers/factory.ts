@@ -33,7 +33,11 @@ export function createProvider(config: Config): Provider {
       if (!config.openrouter?.apiKey) {
         throw new ProviderNotConfiguredError('openrouter');
       }
-      return new OpenRouterProvider(config.openrouter);
+      return new OpenRouterProvider(
+        config.openrouter.apiKey,
+        config.openrouter.model || "z-ai/glm-5.1",
+        config.openrouter.baseUrl || "https://openrouter.ai/api/v1"
+      );
 
     case 'ollama':
       if (!config.ollama) {
@@ -72,7 +76,7 @@ export function createProvider(config: Config): Provider {
       if (!config.llamacpp) {
         throw new ProviderNotConfiguredError('llamacpp');
       }
-      return new LlamaCppProvider(config.llamacpp);
+      return new LlamaCppProvider(config.llamacpp, "llama-3-8b-instruct");
 
     case 'mlx':
       if (!config.mlx) {
@@ -91,7 +95,7 @@ export function createProvider(config: Config): Provider {
 export function createProviderByName(providerName: string, apiKey: string): Provider {
   switch (providerName) {
     case 'openrouter':
-      return new OpenRouterProvider({ apiKey });
+      return new OpenRouterProvider(apiKey);
     case 'ollama':
       return new OllamaProvider();
     case 'openai':

@@ -2,25 +2,7 @@
  * Unit tests for core types
  */
 
-import { Tool, PermissionMode, ToolCall, Message, ToolResult } from "../types";
-
-describe("Tool enum", () => {
-  test("has correct values", () => {
-    expect(Tool.READ_FILE).toBe("read_file");
-    expect(Tool.WRITE_FILE).toBe("write_file");
-    expect(Tool.BASH).toBe("bash");
-    expect(Tool.GIT_STATUS).toBe("git_status");
-    expect(Tool.WEB_SEARCH).toBe("web_search");
-  });
-});
-
-describe("PermissionMode enum", () => {
-  test("has correct values", () => {
-    expect(PermissionMode.YOLO).toBe("yolo");
-    expect(PermissionMode.ASK).toBe("ask");
-    expect(PermissionMode.DENY).toBe("deny");
-  });
-});
+import { ToolCall, Message, ToolResult } from "../types";
 
 describe("ToolCall", () => {
   test("can be created", () => {
@@ -53,12 +35,10 @@ describe("Message", () => {
     const msg: Message = {
       role: "assistant",
       content: "Response",
-      name: "bot",
-      tool_call_id: "tool_123",
       tool_calls: [tc],
     };
-    expect(msg.tool_calls).toHaveLength(1);
-    expect(msg.tool_calls![0].id).toBe("call_1");
+    expect("tool_calls" in msg && msg.tool_calls).toHaveLength(1);
+    expect("tool_calls" in msg && msg.tool_calls![0].id).toBe("call_1");
   });
 });
 

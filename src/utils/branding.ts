@@ -37,8 +37,9 @@ export type BrandedString<T extends string> = string & { readonly __brand: T };
  * Helper to check if a value is a branded type.
  */
 export function isBranded<T extends string>(
-  value: string,
+  value: unknown,
   brand: T
 ): value is BrandedString<T> {
-  return typeof value === 'string' && '__brand' in value;
+  if (typeof value !== 'string') return false;
+  return '__brand' in (value as unknown as Record<string, unknown>);
 }

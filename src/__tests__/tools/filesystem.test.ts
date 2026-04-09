@@ -93,7 +93,7 @@ describe("WriteFileTool", () => {
     });
 
     expect(result.error).toBeUndefined();
-    expect(result.data).toContain("Wrote");
+    expect(result.data).toContain("File written successfully");
 
     const testFile = path.join(tempDir, "test.txt");
     const content = await fs.readFile(testFile, "utf-8");
@@ -150,7 +150,7 @@ describe("EditFileTool", () => {
     });
 
     expect(result.error).toBeUndefined();
-    expect(result.data).toContain("Edited");
+    expect(result.data).toContain("File edited successfully");
 
     const content = await fs.readFile(testFile, "utf-8");
     expect(content).toBe("Hello TypeScript");

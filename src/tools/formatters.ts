@@ -10,8 +10,8 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 
 export class FormatFileTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.FORMAT_FILE;
+  getName(): string {
+    return "format_file";
   }
 
   getDescription(): string {
@@ -40,7 +40,7 @@ export class FormatFileTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
     const formatter = params.formatter as string;
@@ -55,8 +55,8 @@ export class FormatFileTool extends ToolDefinition {
 }
 
 export class FormatDirectoryTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.FORMAT_DIRECTORY;
+  getName(): string {
+    return "format_directory";
   }
 
   getDescription(): string {
@@ -85,7 +85,7 @@ export class FormatDirectoryTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const directoryPath = params.directory_path as string;
     const formatter = params.formatter as string;
@@ -99,8 +99,8 @@ export class FormatDirectoryTool extends ToolDefinition {
 }
 
 export class ListFormattersTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.LIST_FORMATTERS;
+  getName(): string {
+    return "list_formatters";
   }
 
   getDescription(): string {
@@ -114,7 +114,7 @@ export class ListFormattersTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     // Return a list of commonly available formatters
     const formatters = [
       "prettier - JavaScript, TypeScript, CSS, HTML",
@@ -131,8 +131,8 @@ export class ListFormattersTool extends ToolDefinition {
 }
 
 export class CheckFormattingTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.CHECK_FORMATTING;
+  getName(): string {
+    return "check_formatting";
   }
 
   getDescription(): string {
@@ -161,7 +161,7 @@ export class CheckFormattingTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
     const formatter = params.formatter as string;

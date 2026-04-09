@@ -75,7 +75,7 @@ export type PermissionMode = typeof PERMISSION_MODES[number];
  * A tool/function call requested by the LLM.
  */
 export interface ToolCall {
-  id: ToolCallId;
+  id: string;
   name: Tool;
   arguments: string;  // JSON string
 }
@@ -107,7 +107,7 @@ export interface SystemMessage extends BaseMessage {
 export interface ToolMessage extends BaseMessage {
   role: 'tool';
   name?: string;
-  tool_call_id?: ToolCallId;
+  tool_call_id?: string;
 }
 
 export type Message = UserMessage | AssistantMessage | SystemMessage | ToolMessage;
@@ -123,6 +123,7 @@ export interface ToolSchema {
 
 /**
  * Result from executing a tool.
+ * Uses discriminated union for type safety.
  */
 export interface ToolResultSuccess<T = string> {
   data: T;
@@ -136,7 +137,14 @@ export interface ToolResultError {
   metadata?: Record<string, unknown>;
 }
 
-export type ToolResult<T = string> = ToolResultSuccess<T> | ToolResultError;
+// Flexible type for backward compatibility with existing code
+export interface ToolResultFlexible<T = string> {
+  data?: T;
+  error?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export type ToolResult<T = string> = ToolResultSuccess<T> | ToolResultError | ToolResultFlexible<T>;
 
 /**
  * Options controlling agent behavior.

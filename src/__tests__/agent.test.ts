@@ -2,7 +2,7 @@
  * Unit tests for Agent
  */
 
-import { Agent, Tool } from "../index";
+import { Agent, ModelId } from "../index";
 
 describe("Agent", () => {
   test("can be created with minimal args", () => {
@@ -14,10 +14,10 @@ describe("Agent", () => {
   });
 
   test("can be created with tools", () => {
-    const agent = new Agent("Assistant", "You are helpful", [Tool.READ_FILE, Tool.BASH]);
+    const agent = new Agent("Assistant", "You are helpful", ["read_file", "bash"]);
     expect(agent.tools).toHaveLength(2);
-    expect(agent.tools[0]).toBe(Tool.READ_FILE);
-    expect(agent.tools[1]).toBe(Tool.BASH);
+    expect(agent.tools[0]).toBe("read_file");
+    expect(agent.tools[1]).toBe("bash");
   });
 
   test("can be created with max turns", () => {
@@ -34,7 +34,7 @@ describe("Agent", () => {
 
   test("can set model", () => {
     const agent = new Agent("Assistant", "You are helpful");
-    agent.setModel("gpt-4");
+    agent.setModel("gpt-4" as ModelId);
     expect(agent.model).toBe("gpt-4");
   });
 });

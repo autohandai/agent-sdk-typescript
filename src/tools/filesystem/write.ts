@@ -8,8 +8,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 
 export class WriteFileTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.WRITE_FILE;
+  getName(): string {
+    return "write_file";
   }
 
   getDescription(): string {
@@ -38,7 +38,7 @@ export class WriteFileTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
     const content = params.content as string;
@@ -51,11 +51,15 @@ export class WriteFileTool extends ToolDefinition {
       await fs.mkdir(parentDir, { recursive: true });
 
       await fs.writeFile(fullPath, content, "utf-8");
-      return { data: `Wrote ${fullPath}` };
+      return { data: "File written successfully" };
     } catch (error) {
       return {
         error: error instanceof Error ? `Cannot write file: ${error.message}` : "Cannot write file",
       };
     }
+  }
+
+  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+    return this.executeInternal(params);
   }
 }

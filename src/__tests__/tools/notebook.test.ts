@@ -3,13 +3,12 @@
  */
 
 import { NotebookReadTool, NotebookEditTool } from "../../tools/notebook";
-import { Tool } from "../../types";
 
 describe("Notebook Tools", () => {
   describe("NotebookReadTool", () => {
     it("should have correct name", () => {
       const tool = new NotebookReadTool();
-      expect(tool.getName()).toBe(Tool.NOTEBOOK_READ);
+      expect(tool.getName()).toBe("notebook_read");
     });
 
     it("should have description", () => {
@@ -27,7 +26,7 @@ describe("Notebook Tools", () => {
   describe("NotebookEditTool", () => {
     it("should have correct name", () => {
       const tool = new NotebookEditTool();
-      expect(tool.getName()).toBe(Tool.NOTEBOOK_EDIT);
+      expect(tool.getName()).toBe("notebook_edit");
     });
 
     it("should have description", () => {

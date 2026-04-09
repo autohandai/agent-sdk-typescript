@@ -6,8 +6,8 @@ import { ToolDefinition } from "./base";
 import { Tool, ToolResult } from "../types";
 
 export class WebSearchTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.WEB_SEARCH;
+  getName(): string {
+    return "web_search";
   }
 
   getDescription(): string {
@@ -32,7 +32,7 @@ export class WebSearchTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const query = params.query as string;
     const numResults = (params.num_results as number) || 10;
 

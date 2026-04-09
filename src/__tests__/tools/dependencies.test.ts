@@ -7,13 +7,12 @@ import {
   AddDependencyTool,
   RemoveDependencyTool,
 } from "../../tools/dependencies";
-import { Tool } from "../../types";
 
 describe("Dependency Tools", () => {
   describe("ReadPackageManifestTool", () => {
     it("should have correct name", () => {
       const tool = new ReadPackageManifestTool();
-      expect(tool.getName()).toBe(Tool.READ_PACKAGE_MANIFEST);
+      expect(tool.getName()).toBe("read_package_manifest");
     });
 
     it("should have description", () => {
@@ -25,7 +24,7 @@ describe("Dependency Tools", () => {
   describe("AddDependencyTool", () => {
     it("should have correct name", () => {
       const tool = new AddDependencyTool();
-      expect(tool.getName()).toBe(Tool.ADD_DEPENDENCY);
+      expect(tool.getName()).toBe("add_dependency");
     });
 
     it("should have description", () => {
@@ -50,7 +49,7 @@ describe("Dependency Tools", () => {
   describe("RemoveDependencyTool", () => {
     it("should have correct name", () => {
       const tool = new RemoveDependencyTool();
-      expect(tool.getName()).toBe(Tool.REMOVE_DEPENDENCY);
+      expect(tool.getName()).toBe("remove_dependency");
     });
 
     it("should have description", () => {

@@ -8,8 +8,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 
 export class ReadFileTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.READ_FILE;
+  getName(): string {
+    return "read_file";
   }
 
   getDescription(): string {
@@ -34,7 +34,7 @@ export class ReadFileTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
 

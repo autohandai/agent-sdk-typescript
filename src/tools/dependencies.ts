@@ -8,8 +8,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 
 export class ReadPackageManifestTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.READ_PACKAGE_MANIFEST;
+  getName(): string {
+    return "read_package_manifest";
   }
 
   getDescription(): string {
@@ -33,7 +33,7 @@ export class ReadPackageManifestTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const manifestType = params.manifest_type as string;
 
@@ -84,8 +84,8 @@ export class ReadPackageManifestTool extends ToolDefinition {
 }
 
 export class AddDependencyTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.ADD_DEPENDENCY;
+  getName(): string {
+    return "add_dependency";
   }
 
   getDescription(): string {
@@ -115,7 +115,7 @@ export class AddDependencyTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const packageSpec = params.package as string;
     const isDev = params.dev as boolean;
@@ -131,8 +131,8 @@ export class AddDependencyTool extends ToolDefinition {
 }
 
 export class RemoveDependencyTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.REMOVE_DEPENDENCY;
+  getName(): string {
+    return "remove_dependency";
   }
 
   getDescription(): string {
@@ -157,7 +157,7 @@ export class RemoveDependencyTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const packageName = params.package as string;
 

@@ -4,7 +4,7 @@
  */
 
 import { Provider } from "../types/provider";
-import { Message, ToolSchema, ChatResponse, ToolCall } from "../types";
+import { Message, ToolSchema, ChatResponse, ToolCall, Tool as ToolType } from "../types";
 
 export interface MLXConfig {
   baseUrl?: string;
@@ -43,7 +43,7 @@ export class MLXProvider implements Provider {
         messages: messages.map(msg => ({
           role: msg.role,
           content: msg.content,
-          tool_calls: msg.tool_calls ? msg.tool_calls.map(call => ({
+          tool_calls: (msg.role === 'assistant' && 'tool_calls' in msg && msg.tool_calls) ? msg.tool_calls.map(call => ({
             id: call.id,
             type: "function",
             function: {
@@ -70,28 +70,36 @@ export class MLXProvider implements Provider {
       throw new Error(`MLX API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as Record<string, unknown>;
     
     const toolCalls: ToolCall[] = [];
-    if (data.choices?.[0]?.message?.tool_calls) {
-      for (const call of data.choices[0].message.tool_calls) {
+    const choices = data.choices as Array<Record<string, unknown>> | undefined;
+    const firstChoice = choices?.[0] as Record<string, unknown> | undefined;
+    const message = firstChoice?.message as Record<string, unknown> | undefined;
+    
+    if (message?.tool_calls) {
+      const calls = message.tool_calls as Array<Record<string, unknown>>;
+      for (const call of calls) {
+        const fn = call.function as Record<string, unknown>;
         toolCalls.push({
-          id: call.id,
-          name: call.function.name,
-          arguments: JSON.stringify(call.function.arguments),
+          id: call.id as string,
+          name: fn.name as ToolType,
+          arguments: JSON.stringify(fn.arguments),
         });
       }
     }
 
+    const usage = data.usage as Record<string, unknown> | undefined;
+
     return {
-      id: data.choices?.[0]?.message?.id || `chat_${Date.now()}`,
-      content: data.choices?.[0]?.message?.content || "",
+      id: (message?.id as string) || `chat_${Date.now()}`,
+      content: (message?.content as string) || "",
       toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
-      finishReason: data.choices?.[0]?.finish_reason,
-      usage: data.usage ? {
-        prompt_tokens: data.usage.prompt_tokens,
-        completion_tokens: data.usage.completion_tokens,
-        total_tokens: data.usage.total_tokens,
+      finishReason: firstChoice?.finish_reason as string | undefined,
+      usage: usage ? {
+        prompt_tokens: usage.prompt_tokens as number,
+        completion_tokens: usage.completion_tokens as number,
+        total_tokens: usage.total_tokens as number,
       } : undefined,
       raw: data,
     };

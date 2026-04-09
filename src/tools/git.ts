@@ -10,8 +10,8 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 
 export class GitStatusTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_STATUS;
+  getName(): string {
+    return "git_status";
   }
 
   getDescription(): string {
@@ -31,7 +31,7 @@ export class GitStatusTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
 
     try {
@@ -46,8 +46,8 @@ export class GitStatusTool extends ToolDefinition {
 }
 
 export class GitDiffTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_DIFF;
+  getName(): string {
+    return "git_diff";
   }
 
   getDescription(): string {
@@ -71,7 +71,7 @@ export class GitDiffTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -87,8 +87,8 @@ export class GitDiffTool extends ToolDefinition {
 }
 
 export class GitLogTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_LOG;
+  getName(): string {
+    return "git_log";
   }
 
   getDescription(): string {
@@ -112,7 +112,7 @@ export class GitLogTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -128,8 +128,8 @@ export class GitLogTool extends ToolDefinition {
 }
 
 export class GitCommitTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_COMMIT;
+  getName(): string {
+    return "git_commit";
   }
 
   getDescription(): string {
@@ -158,7 +158,7 @@ export class GitCommitTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const message = params.message as string;
     const args = params.args as string;
@@ -175,8 +175,8 @@ export class GitCommitTool extends ToolDefinition {
 }
 
 export class GitAddTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_ADD;
+  getName(): string {
+    return "git_add";
   }
 
   getDescription(): string {
@@ -201,7 +201,7 @@ export class GitAddTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const paths = params.paths as string;
 
@@ -217,8 +217,8 @@ export class GitAddTool extends ToolDefinition {
 }
 
 export class GitResetTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_RESET;
+  getName(): string {
+    return "git_reset";
   }
 
   getDescription(): string {
@@ -242,7 +242,7 @@ export class GitResetTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -258,8 +258,8 @@ export class GitResetTool extends ToolDefinition {
 }
 
 export class GitPushTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_PUSH;
+  getName(): string {
+    return "git_push";
   }
 
   getDescription(): string {
@@ -283,7 +283,7 @@ export class GitPushTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -299,8 +299,8 @@ export class GitPushTool extends ToolDefinition {
 }
 
 export class GitPullTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_PULL;
+  getName(): string {
+    return "git_pull";
   }
 
   getDescription(): string {
@@ -324,7 +324,7 @@ export class GitPullTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -340,8 +340,8 @@ export class GitPullTool extends ToolDefinition {
 }
 
 export class GitFetchTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_FETCH;
+  getName(): string {
+    return "git_fetch";
   }
 
   getDescription(): string {
@@ -365,7 +365,7 @@ export class GitFetchTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -381,8 +381,8 @@ export class GitFetchTool extends ToolDefinition {
 }
 
 export class GitCheckoutTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_CHECKOUT;
+  getName(): string {
+    return "git_checkout";
   }
 
   getDescription(): string {
@@ -406,7 +406,7 @@ export class GitCheckoutTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -422,8 +422,8 @@ export class GitCheckoutTool extends ToolDefinition {
 }
 
 export class GitBranchTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_BRANCH;
+  getName(): string {
+    return "git_branch";
   }
 
   getDescription(): string {
@@ -447,7 +447,7 @@ export class GitBranchTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -463,8 +463,8 @@ export class GitBranchTool extends ToolDefinition {
 }
 
 export class GitMergeTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_MERGE;
+  getName(): string {
+    return "git_merge";
   }
 
   getDescription(): string {
@@ -488,7 +488,7 @@ export class GitMergeTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -504,8 +504,8 @@ export class GitMergeTool extends ToolDefinition {
 }
 
 export class GitRebaseTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_REBASE;
+  getName(): string {
+    return "git_rebase";
   }
 
   getDescription(): string {
@@ -529,7 +529,7 @@ export class GitRebaseTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 
@@ -545,8 +545,8 @@ export class GitRebaseTool extends ToolDefinition {
 }
 
 export class GitStashTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.GIT_STASH;
+  getName(): string {
+    return "git_stash";
   }
 
   getDescription(): string {
@@ -570,7 +570,7 @@ export class GitStashTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const args = params.args as string;
 

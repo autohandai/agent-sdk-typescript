@@ -3,7 +3,7 @@
  */
 
 import { Provider } from "../types/provider";
-import { Message, ToolSchema, ChatResponse, ToolCall } from "../types";
+import { Message, ToolSchema, ChatResponse, ToolCall, Tool as ToolType } from "../types";
 import { config as defaultConfig } from "../config";
 
 export class OpenRouterProvider implements Provider {
@@ -67,7 +67,7 @@ export class OpenRouterProvider implements Provider {
         content: msg.content,
       };
 
-      if (msg.tool_calls && msg.tool_calls.length > 0) {
+      if (msg.role === 'assistant' && 'tool_calls' in msg && msg.tool_calls && msg.tool_calls.length > 0) {
         obj.tool_calls = msg.tool_calls.map((tc) => ({
           id: tc.id,
           type: "function",
@@ -78,11 +78,11 @@ export class OpenRouterProvider implements Provider {
         }));
       }
 
-      if (msg.name) {
+      if ('name' in msg && msg.name) {
         obj.name = msg.name;
       }
 
-      if (msg.tool_call_id) {
+      if ('tool_call_id' in msg && msg.tool_call_id) {
         obj.tool_call_id = msg.tool_call_id;
       }
 
@@ -115,11 +115,11 @@ export class OpenRouterProvider implements Provider {
     if (message.tool_calls) {
       const tcArray = message.tool_calls as Array<Record<string, unknown>>;
       toolCalls = tcArray.map((tc) => {
-        const function_ = tc.function as Record<string, unknown>;
+        const fn = tc.function as Record<string, unknown>;
         return {
           id: tc.id as string,
-          name: function_.name as string,
-          arguments: function_.arguments as string,
+          name: fn.name as ToolType,
+          arguments: fn.arguments as string,
         };
       });
     }

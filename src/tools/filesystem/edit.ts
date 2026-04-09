@@ -8,8 +8,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 
 export class EditFileTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.EDIT_FILE;
+  getName(): string {
+    return "edit_file";
   }
 
   getDescription(): string {
@@ -42,7 +42,7 @@ export class EditFileTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
     const oldString = params.old_string as string;
@@ -52,19 +52,20 @@ export class EditFileTool extends ToolDefinition {
 
     try {
       const content = await fs.readFile(fullPath, "utf-8");
-
       if (!content.includes(oldString)) {
         return { error: "Old string not found in file" };
       }
-
       const newContent = content.replace(oldString, newString);
       await fs.writeFile(fullPath, newContent, "utf-8");
-
-      return { data: `Edited ${fullPath}` };
+      return { data: "File edited successfully" };
     } catch (error) {
       return {
         error: error instanceof Error ? `Cannot edit file: ${error.message}` : "Cannot edit file",
       };
     }
+  }
+
+  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+    return this.executeInternal(params);
   }
 }

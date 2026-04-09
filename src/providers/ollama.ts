@@ -4,7 +4,7 @@
  */
 
 import { Provider } from "../types/provider";
-import { Message, ToolSchema, ChatResponse, ToolCall } from "../types";
+import { Message, ToolSchema, ChatResponse, ToolCall, Tool as ToolType } from "../types";
 
 export class OllamaProvider implements Provider {
   private baseUrl: string;
@@ -57,28 +57,31 @@ export class OllamaProvider implements Provider {
       throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as Record<string, unknown>;
     
     const toolCalls: ToolCall[] = [];
-    if (data.message?.tool_calls) {
-      for (const call of data.message.tool_calls) {
+    const message = data.message as Record<string, unknown> | undefined;
+    if (message?.tool_calls) {
+      const calls = message.tool_calls as Array<Record<string, unknown>>;
+      for (const call of calls) {
+        const fn = call.function as Record<string, unknown>;
         toolCalls.push({
           id: `call_${Date.now()}_${Math.random()}`,
-          name: call.function.name,
-          arguments: JSON.stringify(call.function.arguments),
+          name: fn.name as ToolType,
+          arguments: JSON.stringify(fn.arguments),
         });
       }
     }
 
     return {
       id: `chat_${Date.now()}`,
-      content: data.message?.content || "",
+      content: (message?.content as string) || "",
       toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
       finishReason: data.done ? "stop" : "length",
       usage: {
-        prompt_tokens: data.prompt_eval_count,
-        completion_tokens: data.eval_count,
-        total_tokens: (data.prompt_eval_count || 0) + (data.eval_count || 0),
+        prompt_tokens: data.prompt_eval_count as number,
+        completion_tokens: data.eval_count as number,
+        total_tokens: ((data.prompt_eval_count as number) || 0) + ((data.eval_count as number) || 0),
       },
       raw: data,
     };

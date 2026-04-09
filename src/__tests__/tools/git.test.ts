@@ -18,13 +18,12 @@ import {
   GitRebaseTool,
   GitStashTool,
 } from "../../tools/git";
-import { Tool } from "../../types";
 
 describe("Git Tools", () => {
   describe("GitStatusTool", () => {
     it("should have correct name", () => {
       const tool = new GitStatusTool();
-      expect(tool.getName()).toBe(Tool.GIT_STATUS);
+      expect(tool.getName()).toBe("git_status");
     });
 
     it("should have description", () => {
@@ -43,7 +42,7 @@ describe("Git Tools", () => {
   describe("GitDiffTool", () => {
     it("should have correct name", () => {
       const tool = new GitDiffTool();
-      expect(tool.getName()).toBe(Tool.GIT_DIFF);
+      expect(tool.getName()).toBe("git_diff");
     });
 
     it("should have description", () => {
@@ -55,7 +54,7 @@ describe("Git Tools", () => {
   describe("GitLogTool", () => {
     it("should have correct name", () => {
       const tool = new GitLogTool();
-      expect(tool.getName()).toBe(Tool.GIT_LOG);
+      expect(tool.getName()).toBe("git_log");
     });
 
     it("should have description", () => {
@@ -67,7 +66,7 @@ describe("Git Tools", () => {
   describe("GitCommitTool", () => {
     it("should have correct name", () => {
       const tool = new GitCommitTool();
-      expect(tool.getName()).toBe(Tool.GIT_COMMIT);
+      expect(tool.getName()).toBe("git_commit");
     });
 
     it("should have description", () => {
@@ -85,7 +84,7 @@ describe("Git Tools", () => {
   describe("GitAddTool", () => {
     it("should have correct name", () => {
       const tool = new GitAddTool();
-      expect(tool.getName()).toBe(Tool.GIT_ADD);
+      expect(tool.getName()).toBe("git_add");
     });
 
     it("should have description", () => {
@@ -97,7 +96,7 @@ describe("Git Tools", () => {
   describe("GitResetTool", () => {
     it("should have correct name", () => {
       const tool = new GitResetTool();
-      expect(tool.getName()).toBe(Tool.GIT_RESET);
+      expect(tool.getName()).toBe("git_reset");
     });
 
     it("should have description", () => {
@@ -109,7 +108,7 @@ describe("Git Tools", () => {
   describe("GitPushTool", () => {
     it("should have correct name", () => {
       const tool = new GitPushTool();
-      expect(tool.getName()).toBe(Tool.GIT_PUSH);
+      expect(tool.getName()).toBe("git_push");
     });
 
     it("should have description", () => {
@@ -121,7 +120,7 @@ describe("Git Tools", () => {
   describe("GitPullTool", () => {
     it("should have correct name", () => {
       const tool = new GitPullTool();
-      expect(tool.getName()).toBe(Tool.GIT_PULL);
+      expect(tool.getName()).toBe("git_pull");
     });
 
     it("should have description", () => {
@@ -133,7 +132,7 @@ describe("Git Tools", () => {
   describe("GitFetchTool", () => {
     it("should have correct name", () => {
       const tool = new GitFetchTool();
-      expect(tool.getName()).toBe(Tool.GIT_FETCH);
+      expect(tool.getName()).toBe("git_fetch");
     });
 
     it("should have description", () => {
@@ -145,7 +144,7 @@ describe("Git Tools", () => {
   describe("GitCheckoutTool", () => {
     it("should have correct name", () => {
       const tool = new GitCheckoutTool();
-      expect(tool.getName()).toBe(Tool.GIT_CHECKOUT);
+      expect(tool.getName()).toBe("git_checkout");
     });
 
     it("should have description", () => {
@@ -157,7 +156,7 @@ describe("Git Tools", () => {
   describe("GitBranchTool", () => {
     it("should have correct name", () => {
       const tool = new GitBranchTool();
-      expect(tool.getName()).toBe(Tool.GIT_BRANCH);
+      expect(tool.getName()).toBe("git_branch");
     });
 
     it("should have description", () => {
@@ -169,7 +168,7 @@ describe("Git Tools", () => {
   describe("GitMergeTool", () => {
     it("should have correct name", () => {
       const tool = new GitMergeTool();
-      expect(tool.getName()).toBe(Tool.GIT_MERGE);
+      expect(tool.getName()).toBe("git_merge");
     });
 
     it("should have description", () => {
@@ -181,7 +180,7 @@ describe("Git Tools", () => {
   describe("GitRebaseTool", () => {
     it("should have correct name", () => {
       const tool = new GitRebaseTool();
-      expect(tool.getName()).toBe(Tool.GIT_REBASE);
+      expect(tool.getName()).toBe("git_rebase");
     });
 
     it("should have description", () => {
@@ -193,7 +192,7 @@ describe("Git Tools", () => {
   describe("GitStashTool", () => {
     it("should have correct name", () => {
       const tool = new GitStashTool();
-      expect(tool.getName()).toBe(Tool.GIT_STASH);
+      expect(tool.getName()).toBe("git_stash");
     });
 
     it("should have description", () => {

@@ -8,13 +8,12 @@ import {
   GlobTool,
   SearchInFilesTool,
 } from "../../tools/filesystem/extended";
-import { Tool } from "../../types";
 
 describe("Extended Filesystem Tools", () => {
   describe("ApplyPatchTool", () => {
     it("should have correct name", () => {
       const tool = new ApplyPatchTool();
-      expect(tool.getName()).toBe(Tool.APPLY_PATCH);
+      expect(tool.getName()).toBe("apply_patch");
     });
 
     it("should have description", () => {
@@ -33,7 +32,7 @@ describe("Extended Filesystem Tools", () => {
   describe("FindTool", () => {
     it("should have correct name", () => {
       const tool = new FindTool();
-      expect(tool.getName()).toBe(Tool.FIND);
+      expect(tool.getName()).toBe("find");
     });
 
     it("should have description", () => {
@@ -51,7 +50,7 @@ describe("Extended Filesystem Tools", () => {
   describe("GlobTool", () => {
     it("should have correct name", () => {
       const tool = new GlobTool();
-      expect(tool.getName()).toBe(Tool.GLOB);
+      expect(tool.getName()).toBe("glob");
     });
 
     it("should have description", () => {
@@ -69,7 +68,7 @@ describe("Extended Filesystem Tools", () => {
   describe("SearchInFilesTool", () => {
     it("should have correct name", () => {
       const tool = new SearchInFilesTool();
-      expect(tool.getName()).toBe(Tool.SEARCH_IN_FILES);
+      expect(tool.getName()).toBe("search_in_files");
     });
 
     it("should have description", () => {

@@ -50,7 +50,7 @@ import {
 } from "./linters";
 
 export class ToolRegistry {
-  private tools: Map<Tool, ToolDefinition> = new Map();
+  private tools: Map<string, ToolDefinition> = new Map();
 
   register(tool: ToolDefinition): void {
     this.tools.set(tool.getName(), tool);
@@ -81,7 +81,7 @@ export class ToolRegistry {
     return await tool.execute(params);
   }
 
-  getTools(): Map<Tool, ToolDefinition> {
+  getTools(): Map<string, ToolDefinition> {
     return this.tools;
   }
 }

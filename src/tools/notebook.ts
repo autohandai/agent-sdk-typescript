@@ -8,8 +8,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 
 export class NotebookReadTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.NOTEBOOK_READ;
+  getName(): string {
+    return "notebook_read";
   }
 
   getDescription(): string {
@@ -34,7 +34,7 @@ export class NotebookReadTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
 
@@ -67,8 +67,8 @@ export class NotebookReadTool extends ToolDefinition {
 }
 
 export class NotebookEditTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.NOTEBOOK_EDIT;
+  getName(): string {
+    return "notebook_edit";
   }
 
   getDescription(): string {
@@ -101,7 +101,7 @@ export class NotebookEditTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
     const cellIndex = params.cell_index as number;

@@ -10,8 +10,8 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 
 export class LintFileTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.LINT_FILE;
+  getName(): string {
+    return "lint_file";
   }
 
   getDescription(): string {
@@ -40,7 +40,7 @@ export class LintFileTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const filePath = params.file_path as string;
     const linter = params.linter as string;
@@ -55,8 +55,8 @@ export class LintFileTool extends ToolDefinition {
 }
 
 export class LintDirectoryTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.LINT_DIRECTORY;
+  getName(): string {
+    return "lint_directory";
   }
 
   getDescription(): string {
@@ -85,7 +85,7 @@ export class LintDirectoryTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     const workDir = (params.work_dir as string) || ".";
     const directoryPath = params.directory_path as string;
     const linter = params.linter as string;
@@ -99,8 +99,8 @@ export class LintDirectoryTool extends ToolDefinition {
 }
 
 export class ListLintersTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.LIST_LINTERS;
+  getName(): string {
+    return "list_linters";
   }
 
   getDescription(): string {
@@ -114,7 +114,7 @@ export class ListLintersTool extends ToolDefinition {
     };
   }
 
-  async execute(params: Record<string, unknown>): Promise<ToolResult> {
+  protected async executeInternal(params: Record<string, unknown>): Promise<ToolResult<string>> {
     // Return a list of commonly available linters
     const linters = [
       "eslint - JavaScript, TypeScript",
