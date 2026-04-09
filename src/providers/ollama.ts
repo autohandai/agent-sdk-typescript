@@ -1,10 +1,17 @@
 /**
  * Ollama provider implementation.
  * Uses raw HTTP calls to Ollama API.
+ * Supports timeout, retry, and logging.
  */
 
-import { Provider } from "../types/provider";
+import { Provider, ProviderOptions } from "../types/provider";
 import { Message, ToolSchema, ChatResponse, ToolCall, Tool as ToolType } from "../types";
+import { ProviderError, ValidationError } from "../errors";
+import { withTimeout } from "../utils/timeout";
+import { withRetry } from "../utils/retry";
+import { defaultLogger } from "../utils/logger";
+import { buildMessagesArray, buildToolsArray, parseToolCalls, isRetryableStatusCode } from "./utils";
+import { OllamaResponseSchema } from "./schemas";
 
 export class OllamaProvider implements Provider {
   private baseUrl: string;
@@ -23,8 +30,65 @@ export class OllamaProvider implements Provider {
     messages: Message[],
     model: string,
     tools?: ToolSchema[],
-    maxTokens?: number,
-    temperature?: number
+    options?: ProviderOptions
+  ): Promise<ChatResponse> {
+    const logger = options?.logger || defaultLogger;
+    const timeout = options?.timeout || 30000;
+    const maxRetries = options?.maxRetries || 3;
+
+    logger.debug('Ollama chat request started', {
+      model,
+      toolsCount: tools?.length || 0,
+      messagesCount: messages.length,
+    });
+
+    try {
+      const response = await withRetry(
+        () => withTimeout(
+          (signal) => this.makeRequest(messages, model, tools, options, signal),
+          { timeoutMs: timeout }
+        ),
+        {
+          maxRetries,
+          isRetryable: (error) => {
+            if (error instanceof ProviderError) {
+              const statusCode = error.context?.statusCode as number;
+              return statusCode ? isRetryableStatusCode(statusCode) : true;
+            }
+            return false;
+          },
+          onRetry: (attempt, error, delayMs) => {
+            logger.warn(`Ollama retry attempt ${attempt}`, {
+              error: error.message,
+              delayMs,
+            });
+          },
+        }
+      );
+
+      logger.debug('Ollama chat request succeeded', {
+        responseId: response.id,
+        finishReason: response.finishReason,
+      });
+
+      return response;
+    } catch (error) {
+      if (error instanceof Error) {
+        logger.error('Ollama chat request failed', error, {
+          model,
+          messagesCount: messages.length,
+        });
+      }
+      throw error;
+    }
+  }
+
+  private async makeRequest(
+    messages: Message[],
+    model: string,
+    tools?: ToolSchema[],
+    options?: ProviderOptions,
+    signal?: AbortSignal
   ): Promise<ChatResponse> {
     const response = await fetch(`${this.baseUrl}/api/chat`, {
       method: "POST",
@@ -33,55 +97,55 @@ export class OllamaProvider implements Provider {
       },
       body: JSON.stringify({
         model: model || this.model,
-        messages: messages.map(msg => ({
-          role: msg.role,
-          content: msg.content,
-        })),
-        tools: tools?.map(tool => ({
-          type: "function",
-          function: {
-            name: tool.name,
-            description: tool.description,
-            parameters: tool.parameters,
-          },
-        })),
+        messages: buildMessagesArray(messages),
+        ...(tools && tools.length > 0 ? { tools: buildToolsArray(tools) } : {}),
         stream: false,
         options: {
-          temperature,
-          num_predict: maxTokens,
+          temperature: options?.temperature,
+          num_predict: options?.maxTokens,
         },
       }),
+      signal,
     });
 
     if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
+      throw new ProviderError(
+        `Ollama API error: ${response.status} ${response.statusText}`,
+        'ollama',
+        { statusCode: response.status }
+      );
     }
 
     const data = await response.json() as Record<string, unknown>;
+    return this.parseResponse(data);
+  }
+
+  private parseResponse(data: unknown): ChatResponse {
+    // Validate response structure using Zod
+    const validationResult = OllamaResponseSchema.passthrough().safeParse(data);
     
-    const toolCalls: ToolCall[] = [];
-    const message = data.message as Record<string, unknown> | undefined;
-    if (message?.tool_calls) {
-      const calls = message.tool_calls as Array<Record<string, unknown>>;
-      for (const call of calls) {
-        const fn = call.function as Record<string, unknown>;
-        toolCalls.push({
-          id: `call_${Date.now()}_${Math.random()}`,
-          name: fn.name as ToolType,
-          arguments: JSON.stringify(fn.arguments),
-        });
-      }
+    if (!validationResult.success) {
+      throw new ValidationError(
+        `Invalid API response structure: ${validationResult.error.message}`,
+        'response',
+        data
+      );
     }
+
+    const response = validationResult.data;
+    const message = response.message;
+
+    const toolCalls = message.tool_calls ? parseToolCalls(data) : undefined;
 
     return {
       id: `chat_${Date.now()}`,
-      content: (message?.content as string) || "",
-      toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
-      finishReason: data.done ? "stop" : "length",
+      content: message.content || "",
+      toolCalls,
+      finishReason: response.done ? "stop" : "length",
       usage: {
-        prompt_tokens: data.prompt_eval_count as number,
-        completion_tokens: data.eval_count as number,
-        total_tokens: ((data.prompt_eval_count as number) || 0) + ((data.eval_count as number) || 0),
+        prompt_tokens: response.prompt_eval_count || 0,
+        completion_tokens: response.eval_count || 0,
+        total_tokens: ((response.prompt_eval_count || 0) + (response.eval_count || 0)),
       },
       raw: data,
     };

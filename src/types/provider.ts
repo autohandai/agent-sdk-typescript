@@ -4,6 +4,20 @@
  */
 
 import { Message, ToolSchema, ChatResponse } from "./index";
+import { Logger } from "../utils/logger";
+
+export interface ProviderOptions {
+  /** Request timeout in milliseconds (default: 30000) */
+  timeout?: number;
+  /** Maximum retry attempts for transient failures (default: 3) */
+  maxRetries?: number;
+  /** Logger instance for debugging (default: NoOpLogger) */
+  logger?: Logger;
+  /** Maximum tokens in response (provider-specific) */
+  maxTokens?: number;
+  /** Sampling temperature (provider-specific) */
+  temperature?: number;
+}
 
 export interface Provider {
   /**
@@ -15,18 +29,7 @@ export interface Provider {
   /**
    * Send messages and get a response.
    */
-  chat(messages: Message[], model: string, tools?: ToolSchema[]): Promise<ChatResponse>;
-
-  /**
-   * Send messages and get a response with additional options.
-   */
-  chat(
-    messages: Message[],
-    model: string,
-    tools?: ToolSchema[],
-    maxTokens?: number,
-    temperature?: number
-  ): Promise<ChatResponse>;
+  chat(messages: Message[], model: string, tools?: ToolSchema[], options?: ProviderOptions): Promise<ChatResponse>;
 }
 
 export class ProviderNotConfiguredError extends Error {

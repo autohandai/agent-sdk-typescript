@@ -11,13 +11,13 @@ npm install @autohandai/agent-sdk
 ## Quick Start
 
 ```typescript
-import { Agent, Runner, Tool, OpenRouterProvider } from "@autohandai/agent-sdk";
+import { Agent, Runner, OpenRouterProvider, DefaultToolRegistry } from "@autohandai/agent-sdk";
 
 // Create an agent
 const agent = new Agent(
   "Assistant",
   "You are a helpful coding assistant.",
-  [Tool.READ_FILE, Tool.WRITE_FILE, Tool.BASH]
+  DefaultToolRegistry.getAll()
 );
 
 // Set up the provider
@@ -185,11 +185,11 @@ const ollamaProvider = createProviderByName("ollama"); // No API key needed for 
 Create custom tools by extending `ToolDefinition`:
 
 ```typescript
-import { ToolDefinition, Tool, ToolResult } from "@autohandai/agent-sdk";
+import { ToolDefinition, ToolResult } from "@autohandai/agent-sdk";
 
 class MyCustomTool extends ToolDefinition {
-  getName(): Tool {
-    return Tool.READ_FILE; // or a custom tool enum value
+  getName(): string {
+    return "my_custom_tool";
   }
 
   getDescription(): string {

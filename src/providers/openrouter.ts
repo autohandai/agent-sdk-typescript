@@ -1,10 +1,16 @@
 /**
  * OpenRouter provider using raw HTTP, no external SDK.
+ * Supports timeout, retry, and logging.
  */
 
-import { Provider } from "../types/provider";
+import { Provider, ProviderOptions } from "../types/provider";
 import { Message, ToolSchema, ChatResponse, ToolCall, Tool as ToolType } from "../types";
-import { config as defaultConfig } from "../config";
+import { ProviderError, ValidationError } from "../errors";
+import { withTimeout } from "../utils/timeout";
+import { withRetry } from "../utils/retry";
+import { defaultLogger } from "../utils/logger";
+import { buildMessagesArray, buildToolsArray, parseToolCalls, isRetryableStatusCode, extractStatusCode } from "./utils";
+import { OpenAIResponseSchema } from "./schemas";
 
 export class OpenRouterProvider implements Provider {
   private apiKey: string;
@@ -32,8 +38,65 @@ export class OpenRouterProvider implements Provider {
     messages: Message[],
     model: string,
     tools?: ToolSchema[],
-    maxTokens?: number,
-    temperature?: number
+    options?: ProviderOptions
+  ): Promise<ChatResponse> {
+    const logger = options?.logger || defaultLogger;
+    const timeout = options?.timeout || 30000;
+    const maxRetries = options?.maxRetries || 3;
+
+    logger.debug('OpenRouter chat request started', {
+      model,
+      toolsCount: tools?.length || 0,
+      messagesCount: messages.length,
+    });
+
+    try {
+      const response = await withRetry(
+        () => withTimeout(
+          (signal) => this.makeRequest(messages, model, tools, options, signal),
+          { timeoutMs: timeout }
+        ),
+        {
+          maxRetries,
+          isRetryable: (error) => {
+            if (error instanceof ProviderError) {
+              const statusCode = error.context?.statusCode as number;
+              return statusCode ? isRetryableStatusCode(statusCode) : true;
+            }
+            return false;
+          },
+          onRetry: (attempt, error, delayMs) => {
+            logger.warn(`OpenRouter retry attempt ${attempt}`, {
+              error: error.message,
+              delayMs,
+            });
+          },
+        }
+      );
+
+      logger.debug('OpenRouter chat request succeeded', {
+        responseId: response.id,
+        finishReason: response.finishReason,
+      });
+
+      return response;
+    } catch (error) {
+      if (error instanceof Error) {
+        logger.error('OpenRouter chat request failed', error, {
+          model,
+          messagesCount: messages.length,
+        });
+      }
+      throw error;
+    }
+  }
+
+  private async makeRequest(
+    messages: Message[],
+    model: string,
+    tools?: ToolSchema[],
+    options?: ProviderOptions,
+    signal?: AbortSignal
   ): Promise<ChatResponse> {
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: "POST",
@@ -45,87 +108,49 @@ export class OpenRouterProvider implements Provider {
       },
       body: JSON.stringify({
         model: this.modelName(model || this.defaultModel),
-        messages: this.buildMessagesArray(messages),
-        ...(tools && tools.length > 0 ? { tools: this.buildToolsArray(tools), tool_choice: "auto" } : {}),
-        ...(maxTokens ? { max_tokens: maxTokens } : {}),
-        ...(temperature ? { temperature } : {}),
+        messages: buildMessagesArray(messages),
+        ...(tools && tools.length > 0 ? { tools: buildToolsArray(tools), tool_choice: "auto" } : {}),
+        ...(options?.maxTokens ? { max_tokens: options.maxTokens } : {}),
+        ...(options?.temperature ? { temperature: options.temperature } : {}),
       }),
+      signal,
     });
 
     if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
+      throw new ProviderError(
+        `OpenRouter API error: ${response.status} ${response.statusText}`,
+        'openrouter',
+        { statusCode: response.status }
+      );
     }
 
     const data = await response.json();
     return this.parseResponse(data);
   }
 
-  private buildMessagesArray(messages: Message[]): unknown[] {
-    return messages.map((msg) => {
-      const obj: Record<string, unknown> = {
-        role: msg.role,
-        content: msg.content,
-      };
-
-      if (msg.role === 'assistant' && 'tool_calls' in msg && msg.tool_calls && msg.tool_calls.length > 0) {
-        obj.tool_calls = msg.tool_calls.map((tc) => ({
-          id: tc.id,
-          type: "function",
-          function: {
-            name: tc.name,
-            arguments: tc.arguments,
-          },
-        }));
-      }
-
-      if ('name' in msg && msg.name) {
-        obj.name = msg.name;
-      }
-
-      if ('tool_call_id' in msg && msg.tool_call_id) {
-        obj.tool_call_id = msg.tool_call_id;
-      }
-
-      return obj;
-    });
-  }
-
-  private buildToolsArray(tools: ToolSchema[]): unknown[] {
-    return tools.map((tool) => ({
-      type: "function",
-      function: {
-        name: tool.name,
-        description: tool.description,
-        parameters: tool.parameters,
-      },
-    }));
-  }
-
   private parseResponse(data: unknown): ChatResponse {
-    const response = data as Record<string, unknown>;
-    const id = response.id as string;
-    const choices = response.choices as Array<Record<string, unknown>>;
-    const choice = choices[0];
-    const message = choice.message as Record<string, unknown>;
-
-    const content = (message.content as string) || "";
-    const finishReason = choice.finish_reason as string | undefined;
-
-    let toolCalls: ToolCall[] | undefined;
-    if (message.tool_calls) {
-      const tcArray = message.tool_calls as Array<Record<string, unknown>>;
-      toolCalls = tcArray.map((tc) => {
-        const fn = tc.function as Record<string, unknown>;
-        return {
-          id: tc.id as string,
-          name: fn.name as ToolType,
-          arguments: fn.arguments as string,
-        };
-      });
+    // Validate response structure using Zod
+    const validationResult = OpenAIResponseSchema.passthrough().safeParse(data);
+    
+    if (!validationResult.success) {
+      throw new ValidationError(
+        `Invalid API response structure: ${validationResult.error.message}`,
+        'response',
+        data
+      );
     }
 
+    const response = validationResult.data;
+    const choice = response.choices[0];
+    const message = choice.message;
+
+    const content = message.content || "";
+    const finishReason = choice.finish_reason;
+
+    const toolCalls = message.tool_calls ? parseToolCalls(data) : undefined;
+
     return {
-      id,
+      id: response.id,
       content,
       toolCalls,
       finishReason,

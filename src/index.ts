@@ -41,6 +41,9 @@ export {
 
 // Utilities
 export { createBrand, createConstAssertion, createId, type BrandedString, isBranded } from "./utils/branding";
+export type { Disposable } from "./utils/disposable";
+export { CompositeDisposable } from "./utils/disposable";
+export { SessionManager } from "./utils/session";
 
 // Filesystem tools
 export { ReadFileTool } from "./tools/filesystem/read";
